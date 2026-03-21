@@ -1,366 +1,210 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" data-cb="false">
+<html lang="en" data-theme="dark" data-cb="false" data-hc="false">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KNUCKLE</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0d0d0d; --panel:#161616; --border:#2a2a2a;
-  --text:#e8e8e8; --muted:#555; --sub:#888;
-  --key-bg:#252525; --key-text:#ccc;
-  --accent:#e63946;
-  --correct:#4a9e6b; --present:#c9933a; --absent:#2a2a2a;
-  --absent-key:#1a1a1a; --absent-letter:#444;
-  --modal-bg:rgba(0,0,0,0.78);
-  --bar:#2a2a2a;
-  --challenge:#7b61ff;
-}
-[data-theme="light"] {
-  --bg:#f5f5f0; --panel:#ffffff; --border:#d0d0c8;
-  --text:#1a1a1a; --muted:#aaa; --sub:#666;
-  --key-bg:#d8d8d0; --key-text:#1a1a1a;
-  --absent:#c8c8c0; --absent-key:#c0c0b8; --absent-letter:#888;
-  --modal-bg:rgba(200,200,195,0.85);
-  --bar:#c8c8c0;
-}
-[data-cb="true"] { --correct:#0072b2; --present:#e69f00; }
-* { box-sizing:border-box; margin:0; padding:0; }
-body {
-  background:var(--bg); color:var(--text);
-  font-family:'Space Mono',monospace;
-  min-height:100vh; display:flex; flex-direction:column;
-  align-items:center; overflow-x:hidden;
-  transition:background .3s,color .3s;
-}
-#fx-canvas { position:fixed;inset:0;pointer-events:none;z-index:50; }
-body::before {
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:100;opacity:.35;
-}
-
-/* ── Header ── */
-header {
-  width:100%;border-bottom:1px solid var(--border);
-  padding:13px 16px;display:flex;align-items:center;
-  justify-content:space-between;background:var(--panel);position:relative;
-  transition:background .3s,border-color .3s;
-}
-.logo {
-  font-family:'Bebas Neue',sans-serif;font-size:2.2rem;
-  letter-spacing:.18em;color:var(--text);
-  position:absolute;left:50%;transform:translateX(-50%);
-}
-.logo span { color:var(--accent); }
-.header-left,.header-right { display:flex;gap:8px;align-items:center; }
-.icon-btn {
-  width:36px;height:36px;border:1px solid var(--border);
-  background:var(--key-bg);color:var(--text);
-  font-size:1rem;cursor:pointer;display:flex;align-items:center;
-  justify-content:center;transition:background .2s,border-color .2s,transform .1s;
-  user-select:none;
-}
-.icon-btn:active { transform:scale(.88); }
-.icon-btn.active { border-color:var(--accent);color:var(--accent); }
-.icon-btn.challenge-active { border-color:var(--challenge);color:var(--challenge); }
-
-/* ── Main ── */
-main {
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:22px;padding:28px 20px 16px;
-  width:100%;max-width:500px;
-}
-
-/* ── Mode badge ── */
-#mode-badge {
-  font-size:.58rem;letter-spacing:.25em;color:var(--accent);
-  border:1px solid var(--accent);padding:3px 10px;
-  text-transform:uppercase;display:none;
-}
-#mode-badge.show { display:block; }
-#mode-badge.challenge-badge { color:var(--challenge);border-color:var(--challenge); }
-
-/* ── Streak ── */
-#streak-bar { display:flex;gap:20px;font-size:.65rem;letter-spacing:.1em;color:var(--sub); }
-.streak-item { display:flex;flex-direction:column;align-items:center;gap:2px; }
-.streak-num { font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--text);line-height:1; }
-.streak-lbl { text-transform:uppercase;font-size:.52rem;letter-spacing:.15em;color:var(--muted); }
-
-/* ── Grid ── */
-#grid { display:flex;flex-direction:column;gap:6px; }
-.row { display:flex;gap:6px; }
-.tile {
-  width:56px;height:56px;border:2px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:1.9rem;
-  color:var(--text);background:var(--panel);
-  position:relative;overflow:hidden;will-change:transform;
-  transition:border-color .15s,background .15s;
-}
-@keyframes letterPop {
-  0%{transform:scale(.65) rotate(-5deg);opacity:0;}
-  65%{transform:scale(1.18) rotate(1.5deg);}
-  100%{transform:scale(1) rotate(0);opacity:1;}
-}
-.tile.pop { animation:letterPop .2s cubic-bezier(.34,1.56,.64,1) forwards; }
-@keyframes shake {
-  0%,100%{transform:translateX(0);}
-  14%{transform:translateX(-8px) rotate(-1deg);}
-  28%{transform:translateX(8px) rotate(1deg);}
-  42%{transform:translateX(-5px);}
-  57%{transform:translateX(5px);}
-  71%{transform:translateX(-3px);}
-  85%{transform:translateX(3px);}
-}
-.tile.shake { animation:shake .48s ease; }
-@keyframes invalidFlash {
-  0%,100%{border-color:var(--border);}
-  30%{border-color:var(--accent);box-shadow:0 0 10px var(--accent);}
-  60%{border-color:var(--accent);}
-}
-.tile.invalid { animation:shake .48s ease,invalidFlash .6s ease; }
-.tile.correct { background:var(--correct);border-color:var(--correct);color:#fff; }
-.tile.present { background:var(--present);border-color:var(--present);color:#fff; }
-.tile.absent  { background:var(--absent);border-color:var(--absent);color:var(--absent-letter); }
-@keyframes correctPulse {
-  0%,100%{box-shadow:0 0 8px var(--correct);}
-  50%{box-shadow:0 0 28px 6px var(--correct),inset 0 0 14px rgba(74,158,107,.3);}
-}
-.tile.correct.glowing { animation:correctPulse .9s ease 0s 2; }
-@keyframes winBounce {
-  0%,100%{transform:translateY(0) scale(1);}
-  30%{transform:translateY(-18px) scale(1.12);}
-  60%{transform:translateY(-7px) scale(1.04);}
-}
-.tile.win-bounce { animation:winBounce .65s cubic-bezier(.34,1.56,.64,1) both; }
-@keyframes lossDrop {
-  0%{transform:translateY(0) rotate(0) scale(1);opacity:1;}
-  30%{transform:translateY(-8px) rotate(-2deg) scale(1.05);}
-  100%{transform:translateY(60px) rotate(4deg) scale(.9);opacity:.4;}
-}
-.tile.loss-drop { animation:lossDrop .6s cubic-bezier(.4,0,.6,1) both; }
-.tile::after {
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(transparent 35%,rgba(255,255,255,.09) 50%,transparent 65%);
-  transform:translateY(-120%);pointer-events:none;
-}
-.tile.scan::after { animation:scanline .45s ease .1s forwards; }
-@keyframes scanline { from{transform:translateY(-120%);}to{transform:translateY(120%);} }
-
-/* ── Toast ── */
-#toast {
-  position:fixed;top:76px;left:50%;
-  transform:translateX(-50%) translateY(-14px);
-  background:var(--text);color:var(--bg);
-  padding:9px 20px;font-size:.72rem;letter-spacing:.15em;
-  text-transform:uppercase;font-weight:700;
-  opacity:0;transition:opacity .2s,transform .28s cubic-bezier(.34,1.56,.64,1);
-  pointer-events:none;z-index:200;white-space:nowrap;max-width:90vw;
-  overflow:hidden;text-overflow:ellipsis;
-}
+:root{--bg:#0d0d0d;--panel:#161616;--border:#2a2a2a;--text:#e8e8e8;--muted:#555;--sub:#888;--key-bg:#252525;--key-text:#ccc;--accent:#e63946;--correct:#4a9e6b;--present:#c9933a;--absent:#2a2a2a;--absent-key:#1a1a1a;--absent-letter:#444;--modal-bg:rgba(0,0,0,0.78);--bar:#2a2a2a;--challenge:#7b61ff;--tile-sz:56px;--tile-fs:1.9rem;}
+[data-theme="light"]{--bg:#f5f5f0;--panel:#fff;--border:#d0d0c8;--text:#1a1a1a;--muted:#aaa;--sub:#666;--key-bg:#d8d8d0;--key-text:#1a1a1a;--absent:#c8c8c0;--absent-key:#c0c0b8;--absent-letter:#888;--modal-bg:rgba(200,200,195,0.85);--bar:#c8c8c0;}
+[data-cb="true"]{--correct:#0072b2;--present:#e69f00;}
+[data-hc="true"]{--border:#666;--tile-sz:60px;--tile-fs:2.1rem;--text:#fff;--bg:#000;--panel:#111;--key-bg:#333;--key-text:#fff;--absent:#1a1a1a;--absent-key:#222;--absent-letter:#777;--muted:#888;--sub:#aaa;}
+[data-hc="true"][data-theme="light"]{--border:#333;--text:#000;--bg:#fff;--panel:#f0f0f0;--key-bg:#ccc;--key-text:#000;--absent:#bbb;--absent-key:#bbb;--absent-letter:#555;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;transition:background .3s,color .3s;}
+#fx-canvas{position:fixed;inset:0;pointer-events:none;z-index:50;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.3;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");}
+header{width:100%;border-bottom:2px solid var(--border);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;background:var(--panel);position:relative;transition:background .3s,border-color .3s;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.18em;color:var(--text);position:absolute;left:50%;transform:translateX(-50%);user-select:none;}
+.logo span{color:var(--accent);}
+.header-left,.header-right{display:flex;gap:7px;align-items:center;}
+.icon-btn{width:34px;height:34px;border:1px solid var(--border);background:var(--key-bg);color:var(--text);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s,transform .1s,color .2s;user-select:none;position:relative;}
+.icon-btn:active{transform:scale(.86);}
+.icon-btn.active{border-color:var(--accent);color:var(--accent);}
+.icon-btn.challenge-active{border-color:var(--challenge);color:var(--challenge);}
+.icon-btn.hard-active{border-color:#ff8c00;color:#ff8c00;}
+.icon-btn[data-hard="true"]::after{content:'H';position:absolute;top:-4px;right:-4px;width:12px;height:12px;background:#ff8c00;font-size:.42rem;font-weight:700;color:#000;display:flex;align-items:center;justify-content:center;line-height:12px;text-align:center;}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px 16px 14px;width:100%;max-width:480px;}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.badge{font-size:.55rem;letter-spacing:.22em;padding:3px 9px;text-transform:uppercase;display:none;border:1px solid;}
+.badge.show{display:block;}
+.badge.daily{color:var(--muted);border-color:var(--muted);}
+.badge.hard{color:#ff8c00;border-color:#ff8c00;}
+.badge.challenge{color:var(--challenge);border-color:var(--challenge);}
+.badge.endless{color:var(--accent);border-color:var(--accent);}
+#streak-bar{display:flex;gap:18px;}
+.streak-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.streak-num{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--text);line-height:1;display:flex;align-items:center;gap:3px;}
+.streak-flame{font-size:1rem;display:none;}
+.streak-flame.show{display:inline;animation:flamePulse 1.2s ease infinite;}
+@keyframes flamePulse{0%,100%{transform:scale(1) rotate(-3deg);filter:brightness(1);}50%{transform:scale(1.2) rotate(3deg);filter:brightness(1.3);}}
+.streak-lbl{text-transform:uppercase;font-size:.5rem;letter-spacing:.14em;color:var(--muted);}
+#tension-bar{width:100%;height:3px;background:var(--border);position:relative;overflow:hidden;transition:opacity .3s;opacity:0;}
+#tension-bar.show{opacity:1;}
+#tension-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--correct),var(--present),var(--accent));transition:width .6s cubic-bezier(.4,0,.2,1);}
+#tension-bar.critical #tension-fill{animation:tensionPulse .6s ease infinite;background:var(--accent);}
+@keyframes tensionPulse{0%,100%{filter:brightness(1);}50%{filter:brightness(1.6);box-shadow:0 0 8px var(--accent);}}
+#grid{display:flex;flex-direction:column;gap:5px;}
+.row{display:flex;gap:5px;}
+.tile{width:var(--tile-sz);height:var(--tile-sz);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:var(--tile-fs);color:var(--text);background:var(--panel);position:relative;overflow:hidden;will-change:transform;transition:border-color .15s,background .15s;}
+.row.active-row .tile:not(.correct):not(.present):not(.absent){border-color:var(--sub);}
+.row.active-row .tile.filled{border-color:var(--text);}
+@keyframes tileIntro{from{opacity:0;transform:scale(.7) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.tile.intro{animation:tileIntro .35s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes letterPop{0%{transform:scale(.65) rotate(-5deg);opacity:0;}65%{transform:scale(1.18) rotate(1.5deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+.tile.pop{animation:letterPop .2s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes shake{0%,100%{transform:translateX(0);}14%{transform:translateX(-8px) rotate(-1deg);}28%{transform:translateX(8px) rotate(1deg);}42%{transform:translateX(-5px);}57%{transform:translateX(5px);}71%{transform:translateX(-3px);}85%{transform:translateX(3px);}}
+.tile.shake{animation:shake .48s ease;}
+@keyframes invalidFlash{0%,100%{border-color:var(--border);}30%{border-color:var(--accent);box-shadow:0 0 10px var(--accent);}60%{border-color:var(--accent);}}
+.tile.invalid{animation:shake .48s ease,invalidFlash .6s ease;}
+.tile.correct{background:var(--correct);border-color:var(--correct);color:#fff;}
+.tile.present{background:var(--present);border-color:var(--present);color:#fff;}
+.tile.absent{background:var(--absent);border-color:var(--absent);color:var(--absent-letter);}
+@keyframes correctPulse{0%,100%{box-shadow:0 0 8px var(--correct);}50%{box-shadow:0 0 28px 6px var(--correct),inset 0 0 14px rgba(74,158,107,.3);}}
+.tile.correct.glowing{animation:correctPulse .9s ease 0s 2;}
+@keyframes winBounce{0%,100%{transform:translateY(0) scale(1);}30%{transform:translateY(-18px) scale(1.12);}60%{transform:translateY(-7px) scale(1.04);}}
+.tile.win-bounce{animation:winBounce .65s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes lossDrop{0%{transform:translateY(0) rotate(0) scale(1);opacity:1;}30%{transform:translateY(-8px) rotate(-2deg) scale(1.05);}100%{transform:translateY(60px) rotate(4deg) scale(.9);opacity:.4;}}
+.tile.loss-drop{animation:lossDrop .6s cubic-bezier(.4,0,.6,1) both;}
+.tile::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(255,255,255,.09) 50%,transparent 65%);transform:translateY(-120%);pointer-events:none;}
+.tile.scan::after{animation:scanline .45s ease .1s forwards;}
+@keyframes scanline{from{transform:translateY(-120%);}to{transform:translateY(120%);}}
+#grid.tension-2 .row.active-row .tile{border-color:var(--present);}
+#grid.tension-1 .row.active-row .tile{border-color:var(--accent);box-shadow:0 0 6px color-mix(in srgb,var(--accent) 30%,transparent);}
+#toast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-14px);background:var(--text);color:var(--bg);padding:9px 20px;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;opacity:0;transition:opacity .2s,transform .28s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:200;white-space:nowrap;max-width:90vw;}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 #toast.error{background:var(--accent);color:#fff;}
-
-/* ── Keyboard ── */
+#toast.warn{background:#ff8c00;color:#000;}
 #keyboard{display:flex;flex-direction:column;gap:5px;align-items:center;width:100%;}
 .kb-row{display:flex;gap:4px;}
-.key {
-  height:50px;min-width:34px;padding:0 5px;
-  background:var(--key-bg);color:var(--key-text);border:1px solid var(--border);
-  font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .28s,color .28s,border-color .28s,box-shadow .28s,transform .1s;
-  letter-spacing:.05em;text-transform:uppercase;user-select:none;
-}
+.key{height:48px;min-width:32px;padding:0 4px;background:var(--key-bg);color:var(--key-text);border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.66rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .28s,color .28s,border-color .28s,box-shadow .28s,transform .1s;letter-spacing:.04em;text-transform:uppercase;user-select:none;}
 .key:active{transform:scale(.9);}
-.key.wide{min-width:54px;font-size:.58rem;}
-.key.correct{background:var(--correct);border-color:var(--correct);color:#fff;box-shadow:0 0 10px color-mix(in srgb,var(--correct) 50%,transparent);}
-.key.present{background:var(--present);border-color:var(--present);color:#fff;box-shadow:0 0 10px color-mix(in srgb,var(--present) 50%,transparent);}
+.key.wide{min-width:52px;font-size:.56rem;}
+.key.correct{background:var(--correct);border-color:var(--correct);color:#fff;}
+.key.present{background:var(--present);border-color:var(--present);color:#fff;}
 .key.absent{background:var(--absent-key);border-color:var(--absent-key);color:var(--absent-letter);}
 @keyframes keyPop{0%{transform:scale(1);}45%{transform:scale(1.22);}100%{transform:scale(1);}}
 .key.just-revealed{animation:keyPop .32s cubic-bezier(.34,1.56,.64,1);}
-
-/* ── End screen ── */
-#end-screen{display:none;flex-direction:column;align-items:center;gap:14px;text-align:center;}
+#end-screen{display:none;flex-direction:column;align-items:center;gap:13px;text-align:center;}
 #end-screen.show{display:flex;animation:endIn .7s cubic-bezier(.34,1.56,.64,1) both;}
 @keyframes endIn{from{opacity:0;transform:translateY(24px) scale(.92);}to{opacity:1;transform:translateY(0) scale(1);}}
-.end-label{font-size:.62rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;}
-.end-word{font-family:'Bebas Neue',sans-serif;font-size:3.8rem;letter-spacing:.2em;color:var(--accent);line-height:1;animation:wordGlow 2s ease infinite;}
+.end-label{font-size:.6rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;}
+.end-word{font-family:'Bebas Neue',sans-serif;font-size:3.6rem;letter-spacing:.2em;color:var(--accent);line-height:1;animation:wordGlow 2s ease infinite;}
 @keyframes wordGlow{0%,100%{text-shadow:0 0 20px rgba(230,57,70,.5);}50%{text-shadow:0 0 60px rgba(230,57,70,.9),0 0 100px rgba(230,57,70,.4);}}
-.end-msg{font-size:.72rem;color:var(--sub);letter-spacing:.08em;max-width:280px;line-height:1.7;}
-.end-actions{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;justify-content:center;}
-.end-btn{padding:9px 18px;font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:1px solid;transition:transform .1s,box-shadow .2s;}
+.end-msg{font-size:.7rem;color:var(--sub);letter-spacing:.07em;max-width:300px;line-height:1.7;}
+#end-definition{font-size:.65rem;color:var(--sub);font-style:italic;max-width:300px;line-height:1.6;display:none;padding:10px 0;border-top:1px solid var(--border);}
+#end-definition.show{display:block;}
+.end-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:4px;}
+.end-btn{padding:9px 16px;font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border:1px solid;transition:transform .1s,box-shadow .2s;}
 .end-btn:active{transform:scale(.94);}
 .btn-share{background:var(--correct);border-color:var(--correct);color:#fff;}
 .btn-replay{background:transparent;border-color:var(--accent);color:var(--accent);}
 .btn-challenge-again{background:transparent;border-color:var(--challenge);color:var(--challenge);}
-.divider{width:40px;height:1px;background:var(--border);}
-
-/* ── Modal base ── */
-.modal-overlay {
-  position:fixed;inset:0;background:var(--modal-bg);
-  z-index:300;display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .25s;
-  backdrop-filter:blur(5px);
-}
+.modal-overlay{position:fixed;inset:0;background:var(--modal-bg);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(5px);}
 .modal-overlay.open{opacity:1;pointer-events:all;}
-.modal {
-  background:var(--panel);border:1px solid var(--border);
-  padding:26px 26px 22px;width:min(360px,94vw);
-  transform:translateY(20px) scale(.96);
-  transition:transform .32s cubic-bezier(.34,1.56,.64,1);
-  position:relative;
-}
+.modal{background:var(--panel);border:1px solid var(--border);padding:24px 24px 20px;width:min(360px,94vw);transform:translateY(20px) scale(.96);transition:transform .32s cubic-bezier(.34,1.56,.64,1);position:relative;}
 .modal-overlay.open .modal{transform:translateY(0) scale(1);}
-.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.18em;color:var(--text);margin-bottom:18px;text-align:center;}
-.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;transition:color .15s;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.45rem;letter-spacing:.18em;color:var(--text);margin-bottom:16px;text-align:center;}
+.modal-close{position:absolute;top:11px;right:13px;background:none;border:none;color:var(--muted);font-size:1.05rem;cursor:pointer;transition:color .15s;}
 .modal-close:hover{color:var(--text);}
-
-/* ── Stats modal ── */
-.stat-row{display:flex;justify-content:center;gap:18px;margin-bottom:18px;}
+.stat-row{display:flex;justify-content:center;gap:16px;margin-bottom:16px;}
 .stat-box{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.stat-n{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--text);line-height:1;}
-.stat-l{font-size:.52rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;text-align:center;max-width:52px;}
-.chart-title{font-size:.56rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;text-align:center;}
-.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:.65rem;}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:var(--text);line-height:1;}
+.stat-l{font-size:.5rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;text-align:center;max-width:52px;}
+.chart-title{font-size:.54rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:9px;text-align:center;}
+.bar-row{display:flex;align-items:center;gap:7px;margin-bottom:4px;font-size:.62rem;}
 .bar-label{color:var(--sub);width:10px;text-align:right;}
-.bar-track{flex:1;height:18px;background:var(--bar);position:relative;overflow:hidden;}
-.bar-fill{height:100%;background:var(--correct);display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-family:'Space Mono',monospace;font-size:.6rem;color:#fff;font-weight:700;min-width:18px;transition:width .6s cubic-bezier(.34,1,.64,1);}
+.bar-track{flex:1;height:17px;background:var(--bar);overflow:hidden;}
+.bar-fill{height:100%;background:var(--correct);display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-family:'Space Mono',monospace;font-size:.58rem;color:#fff;font-weight:700;min-width:17px;transition:width .6s cubic-bezier(.34,1,.64,1);}
 .bar-fill.current{background:var(--accent);}
-
-/* ── Challenge modal ── */
 .challenge-modal .modal{border-color:var(--challenge);}
 .challenge-modal .modal-title{color:var(--challenge);}
-
-/* tabs */
-.ch-tabs{display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);}
-.ch-tab{flex:1;padding:9px;font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:transparent;color:var(--muted);border:none;transition:background .2s,color .2s;}
+.ch-tabs{display:flex;margin-bottom:18px;border:1px solid var(--border);}
+.ch-tab{flex:1;padding:8px;font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;background:transparent;color:var(--muted);border:none;transition:background .2s,color .2s;}
 .ch-tab.active{background:var(--challenge);color:#fff;}
-
-/* SET panel */
 #ch-set-panel,#ch-enter-panel{display:none;}
 #ch-set-panel.active,#ch-enter-panel.active{display:block;}
-
-.ch-label{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.ch-word-display{
-  display:flex;gap:6px;justify-content:center;margin-bottom:16px;
-}
-.ch-tile{
-  width:48px;height:48px;border:2px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:var(--text);
-  background:var(--panel);transition:border-color .15s;
-}
+.ch-label{font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.ch-word-display{display:flex;gap:5px;justify-content:center;margin-bottom:14px;}
+.ch-tile{width:46px;height:46px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--text);background:var(--panel);transition:border-color .15s;}
 .ch-tile.active-ch{border-color:var(--challenge);box-shadow:0 0 8px color-mix(in srgb,var(--challenge) 40%,transparent);}
 .ch-tile.filled{border-color:var(--sub);}
-
-.ch-keyboard{display:flex;flex-direction:column;gap:4px;align-items:center;margin-bottom:14px;}
+.ch-keyboard{display:flex;flex-direction:column;gap:3px;align-items:center;margin-bottom:12px;}
 .ch-kb-row{display:flex;gap:3px;}
-.ch-key{
-  height:40px;min-width:28px;padding:0 4px;
-  background:var(--key-bg);color:var(--key-text);border:1px solid var(--border);
-  font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:transform .1s;letter-spacing:.04em;text-transform:uppercase;user-select:none;
-}
+.ch-key{height:38px;min-width:27px;padding:0 3px;background:var(--key-bg);color:var(--key-text);border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.58rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s;letter-spacing:.04em;text-transform:uppercase;user-select:none;}
 .ch-key:active{transform:scale(.88);}
-.ch-key.wide{min-width:44px;font-size:.5rem;}
-
-.ch-error{font-size:.62rem;color:var(--accent);letter-spacing:.1em;min-height:18px;margin-bottom:10px;text-align:center;}
-
-/* code display */
-.code-box{
-  background:var(--bg);border:1px solid var(--challenge);
-  padding:14px;text-align:center;margin-bottom:14px;
-  display:none;
-}
+.ch-key.wide{min-width:42px;font-size:.48rem;}
+.ch-error{font-size:.6rem;color:var(--accent);letter-spacing:.09em;min-height:16px;margin-bottom:9px;text-align:center;}
+.code-box{background:var(--bg);border:1px solid var(--challenge);padding:13px;text-align:center;margin-bottom:13px;display:none;}
 .code-box.show{display:block;animation:endIn .4s ease both;}
-.code-label{font-size:.52rem;letter-spacing:.25em;color:var(--challenge);text-transform:uppercase;margin-bottom:6px;}
-.code-value{
-  font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.3em;
-  color:var(--text);word-break:break-all;
-}
-.code-hint{font-size:.52rem;color:var(--muted);letter-spacing:.1em;margin-top:6px;}
-
-/* ENTER panel */
-.ch-input-wrap{display:flex;gap:8px;margin-bottom:12px;}
-.ch-code-input{
-  flex:1;background:var(--bg);border:1px solid var(--border);
-  color:var(--text);font-family:'Space Mono',monospace;font-size:.85rem;
-  padding:10px 12px;letter-spacing:.2em;text-transform:uppercase;
-  outline:none;transition:border-color .2s;
-}
+.code-label{font-size:.5rem;letter-spacing:.25em;color:var(--challenge);text-transform:uppercase;margin-bottom:5px;}
+.code-value{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.28em;color:var(--text);word-break:break-all;}
+.code-hint{font-size:.5rem;color:var(--muted);letter-spacing:.09em;margin-top:5px;}
+.ch-input-wrap{display:flex;gap:7px;margin-bottom:11px;}
+.ch-code-input{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Space Mono',monospace;font-size:.82rem;padding:9px 11px;letter-spacing:.18em;text-transform:uppercase;outline:none;transition:border-color .2s;}
 .ch-code-input:focus{border-color:var(--challenge);}
-.ch-code-input::placeholder{font-size:.65rem;letter-spacing:.1em;color:var(--muted);}
-.ch-go-btn{
-  padding:10px 16px;background:var(--challenge);border:1px solid var(--challenge);
-  color:#fff;font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
-  transition:transform .1s,box-shadow .2s;
-}
+.ch-code-input::placeholder{font-size:.6rem;letter-spacing:.09em;color:var(--muted);}
+.ch-go-btn{padding:9px 14px;background:var(--challenge);border:1px solid var(--challenge);color:#fff;font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;transition:transform .1s;}
 .ch-go-btn:active{transform:scale(.94);}
-.ch-go-btn:hover{box-shadow:0 0 14px color-mix(in srgb,var(--challenge) 50%,transparent);}
-
-.full-btn{
-  width:100%;padding:10px;background:var(--challenge);border:1px solid var(--challenge);
-  color:#fff;font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
-  transition:transform .1s,box-shadow .2s;margin-top:2px;
-}
+.full-btn{width:100%;padding:9px;background:var(--challenge);border:1px solid var(--challenge);color:#fff;font-family:'Space Mono',monospace;font-size:.66rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;cursor:pointer;transition:transform .1s;margin-top:2px;}
 .full-btn:active{transform:scale(.97);}
-.full-btn.copy-btn{background:transparent;border-color:var(--challenge);color:var(--challenge);margin-top:8px;}
-
-/* cb label */
-#cb-label{font-size:.52rem;letter-spacing:.2em;color:var(--present);text-transform:uppercase;display:none;}
-[data-cb="true"] #cb-label{display:block;}
+.full-btn.copy-btn{background:transparent;border-color:var(--challenge);color:var(--challenge);margin-top:7px;}
+.full-btn:disabled{opacity:.4;cursor:not-allowed;}
+.pill-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+.pill{font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;padding:2px 7px;border:1px solid;display:none;}
+[data-cb="true"] .pill.cb-pill{display:inline-block;color:var(--present);border-color:var(--present);}
+[data-hc="true"] .pill.hc-pill{display:inline-block;color:var(--accent);border-color:var(--accent);}
 </style>
 </head>
 <body>
 <canvas id="fx-canvas"></canvas>
 <header>
   <div class="header-left">
-    <button class="icon-btn" id="btn-cb"    title="Colour blind mode" aria-label="Colour blind mode">◑</button>
-    <button class="icon-btn" id="btn-theme" title="Toggle theme"       aria-label="Toggle theme">☀</button>
+    <button class="icon-btn" id="btn-cb"    title="Colour blind mode">◑</button>
+    <button class="icon-btn" id="btn-hc"    title="High contrast">◈</button>
+    <button class="icon-btn" id="btn-theme" title="Toggle theme">☀</button>
   </div>
   <div class="logo">K<span>N</span>UCKLE</div>
   <div class="header-right">
-    <button class="icon-btn" id="btn-challenge" title="Challenge a friend" aria-label="Challenge a friend">⚔</button>
-    <button class="icon-btn" id="btn-stats"     title="Statistics"         aria-label="Statistics">▦</button>
+    <button class="icon-btn" id="btn-hard"      title="Hard mode">H</button>
+    <button class="icon-btn" id="btn-challenge" title="Challenge a friend">⚔</button>
+    <button class="icon-btn" id="btn-stats"     title="Statistics">▦</button>
   </div>
 </header>
-
 <div id="toast" role="alert" aria-live="assertive"></div>
-
 <main>
-  <div id="mode-badge"></div>
-  <div id="cb-label">colour blind on</div>
-
+  <div class="badge-row">
+    <div class="badge daily"     id="badge-daily">Daily #<span id="day-num">1</span></div>
+    <div class="badge hard"      id="badge-hard">Hard Mode</div>
+    <div class="badge challenge" id="badge-challenge">⚔ Challenge</div>
+    <div class="badge endless"   id="badge-endless">Endless</div>
+  </div>
+  <div class="pill-row">
+    <span class="pill cb-pill">Colour Blind</span>
+    <span class="pill hc-pill">High Contrast</span>
+  </div>
   <div id="streak-bar">
     <div class="streak-item"><div class="streak-num" id="s-played">0</div><div class="streak-lbl">Played</div></div>
-    <div class="streak-item"><div class="streak-num" id="s-streak">0</div><div class="streak-lbl">Streak</div></div>
+    <div class="streak-item"><div class="streak-num"><span id="s-streak">0</span><span class="streak-flame" id="streak-flame">🔥</span></div><div class="streak-lbl">Streak</div></div>
     <div class="streak-item"><div class="streak-num" id="s-best">0</div><div class="streak-lbl">Best</div></div>
     <div class="streak-item"><div class="streak-num" id="s-pct">0%</div><div class="streak-lbl">Win %</div></div>
   </div>
-
+  <div id="tension-bar"><div id="tension-fill"></div></div>
   <div id="grid"></div>
-
   <div id="end-screen">
     <div class="end-label" id="end-label">The word was</div>
     <div class="end-word"  id="end-word"></div>
     <div class="end-msg"   id="end-msg"></div>
+    <div id="end-definition"></div>
     <div class="end-actions">
-      <button class="end-btn btn-share"          id="btn-share">Share 🟩</button>
-      <button class="end-btn btn-replay"          id="btn-replay"          style="display:none">Play Again</button>
-      <button class="end-btn btn-challenge-again" id="btn-challenge-again" style="display:none">Set New Challenge ⚔</button>
+      <button class="end-btn btn-share"         id="btn-share">Share 🟩</button>
+      <button class="end-btn btn-replay"         id="btn-replay"          style="display:none">Play Again</button>
+      <button class="end-btn btn-challenge-again"id="btn-challenge-again" style="display:none">New Challenge ⚔</button>
     </div>
   </div>
-
   <div id="keyboard"></div>
 </main>
-
-<!-- Stats Modal -->
 <div class="modal-overlay" id="stats-modal" role="dialog" aria-modal="true">
   <div class="modal">
     <button class="modal-close" id="stats-close">✕</button>
@@ -375,36 +219,27 @@ main {
     <div id="dist-chart"></div>
   </div>
 </div>
-
-<!-- Challenge Modal -->
 <div class="modal-overlay challenge-modal" id="challenge-modal" role="dialog" aria-modal="true">
   <div class="modal">
     <button class="modal-close" id="challenge-close">✕</button>
     <div class="modal-title">⚔ Challenge</div>
-
     <div class="ch-tabs">
       <button class="ch-tab active" id="tab-set">Set a Word</button>
       <button class="ch-tab"        id="tab-enter">Enter a Code</button>
     </div>
-
-    <!-- SET panel -->
     <div id="ch-set-panel" class="active">
       <div class="ch-label">Type your secret word</div>
       <div class="ch-word-display" id="ch-word-display"></div>
       <div class="ch-keyboard" id="ch-keyboard"></div>
       <div class="ch-error" id="ch-error"></div>
-
       <div class="code-box" id="code-box">
         <div class="code-label">Challenge Code</div>
         <div class="code-value" id="code-value"></div>
-        <div class="code-hint">Share this code — they'll enter it to guess your word</div>
+        <div class="code-hint">Share this — they enter it to guess your word</div>
       </div>
-
       <button class="full-btn" id="btn-gen-code">Generate Code</button>
       <button class="full-btn copy-btn" id="btn-copy-code" style="display:none">Copy Code to Clipboard</button>
     </div>
-
-    <!-- ENTER panel -->
     <div id="ch-enter-panel">
       <div class="ch-label">Paste a challenge code</div>
       <div class="ch-input-wrap">
@@ -412,608 +247,149 @@ main {
         <button class="ch-go-btn" id="btn-load-code">Go</button>
       </div>
       <div class="ch-error" id="ch-enter-error"></div>
-      <button class="full-btn" id="btn-start-challenge">Start Challenge</button>
+      <button class="full-btn" id="btn-start-challenge" disabled>Start Challenge</button>
     </div>
   </div>
 </div>
-
 <script>
-// ════════════════════════════════════════════════════════
-//  WORD LIST
-// ════════════════════════════════════════════════════════
-const RAW = `cigar rebut sissy humph awry fever lucky steal jumbo lofty awoke taunt siege graze woken creed flood gouge cargo tidal robin stint asked blunt gusts nasty flair shaft clams crimp shake aloof plaid globs fleas whack shire foggy forte piped rumba boxer skied chess flint hound cloak hyper awash swoop jaunt quirk skimp blaze craft gripe pinch mauve skirt limbo booze spell terse clump spurn drank croup throb fought plumb rumor kitty beats holly prank trill given gruel stink ferry farce sauce tacit groan horde gorge taupe sixty slave bleed floss girth botch drawl glean rebel forge gaudy tweed drake hairy wells toxin bleep zonal aping shone epoch shunt gawky blurt sunny dross elope waltz gloat slang spout glint gruff scamp slurp smock yodel spank stark stomp swill taper tithe tryst unfit vicar vouch wring ankle atone beady began bliss blood blown cargo chest claim clasp comet coral crave derby elbow ember feral franc frisk gauze ghoul glade glare gloss gnome graft grail gross grout gully guile gulch haunt heave hefty hoist homer horde hussy hutch hyena igloo index inept inlet inter kabob knife krona kudos lapel large larva leaky leapt liver local lodge logic lowly lucid lusty lyric magic manor manic matte mealy medal mercy messy mogul moldy money monks moose moron morph motto moult mouse mouth mucky muddy mulch mural nasal naval needy nervy noisy notch nymph offal optic orbit parka peace petal petty phase phone phony picky pinky pixel plaza plead plume plunk poach poker poppy porch pouty preen prima primp prize prose prowl proxy prude psalm psych pubic purse quaff qualm quash quasi quell quest queue quick quill quirk quota quote rabbi racer radar rafty rainy rally ranch rapid raven rawly reach retch retro ridge risky rival rivet robot rocky romeo royal ruddy rugby ruler runty rusty sadly sassy satyr sauce savvy seamy sedan seedy serve seven shady shame shark sheep shelf shell shirk shock showy shrug siege sieve silly sinew sixth sixty skimp skull slack slang slant slash sleek slept slick slide slope slurp slyly smack smear smile smock smoke snaky snarl sneer snide sniff snore snort snuff softy solar solid solve sorry spank spare spark spawn spear speck spiel spike spill spine spoof spook spool spout spray spree sprig spunk staid stalk stall stave steal steel stern stiff stile stilt stomp stork storm strap straw stray strip strut stump stunk suede suite sunny surly swamp swarm swear sweat swept swill swipe swoop tabby taboo taffy talon tammy tangy tardy tawny taunt tawse tease tempt terse thief think thorn throb throw thrum timid titan topaz topsy torch towel trace trade trail trait tramp trawl tread treat trend triad tribe trick tried tripe troth trove truce trump tryst tuber tummy tuner turbo twang tweak twice twill swirl trite trout tweed ulcer ultra umbra unify unite unlit utter usual vague vapid vault vaunt visor vista vixen vogue voila voile vomit voter vouch wacky waltz warty waste watch water weary weave weedy weigh weird whiff while whine white whole whose witch wispy woken world wormy worse worst wrath wreak wreck wring wrist wrote abash abase abate abbey abbot abhor abide abound above abuse abyss acted acrid acorn adept admit adobe adore adult agape agile aging aglow agony agree ahead aided aimer aioli aisle allay alley allot allow alloy aloft alone along aloof aloud alpha altar alter amend amiss amuse angel anger angle angry anime annex annoy antsy anvil aorta apple apply aptly ardor arena argot arise armed aroma arson ashen atlas attic audio audit augur avail avert avid avow axial azure bacon bagel baggy balmy banjo baron baste batch bayou beige berth bevel birch bison blimp bloke bloat bored borax brace braid brake brand brash brawn breed briar bride brine brink briny brisk broil brook broth budge buggy bulge bully bunch bunny burly butch bylaw cadet cameo camel carol carom carry caste catch cavil cedar chafe champ chaos chasm cheer chief chive choir choke chore chump churn cinch civet clack clang clank clash cleat cleft clerk click cliff cling cloak clone clout cluck clunk comet comic copse coset cough crack craft crave creep crimp crisp croak croon croup crypt cubby curly curry cycle daddy daily daisy dandy datum daunt deify delta denim depot derby devil diary dirty disco ditty dodge dogma dolly dowdy dowel draft drain drake drawl droll drone drool droop drove drunk dryer dusky dusty dwarf dwell eager early ebony egret elbow ember emcee emery envy equip erupt essay ethyl evade every exact exert extol fable faint fairy farce fazed feast fern ferry fetal fetus fiend fiery fifth filth flair flame flank flint float floor floss flout flown fluff fluke flung flunk flute foamy focal forge foyer franc freak friar frisk fritz frond frost froze fudge fugue fully fungi funny furor gaudy gavel gawky gecko geeky ghoul giddy gleam glean glint gloat gloom glued gnash gorge gouge gourd gravy graze greet grief grime groan groom gross grove growl gruel gruff grunt guava guile gulch gully gusto handy hanky hardy harpy haste heady heist herby heron hippo hippy hoard hoary hokey homer horde horny hotly hubby human humor hunky hurly husky hutch hyena index indie infer inter intro ionic irate islet ivory juicy jumpy juror kayak kebab kinky knave knelt kooky krona lacey laffy lamed lanky larva latch leech leggy lemon letch lewd lingo liver livid loopy lousy lowly lusty madam manly manor maple mauve mealy medal mercy melee melon messy milky minty mirth mocha mogul moldy moody muddy muggy mulch nanny nasty naval needy nervy nifty nippy noisy nutsy nymph oaken oddly offal oiled oldie oozed optic orbit ovoid oxide ozone paddy panda pansy patsy penal penny perky pesky petty phony piano piety pilaf pinky pizza plank plaza plead pleat plonk plotz plumb plume plunk podgy poker polka poppy porch pouty prank prawn primp privy prize prone prowl prude psalm pubic puffy pulpy purge pupil quaff qualm quiff quota rabid ramen randy raven recto regal rerun resin retro rider rigid risky rival rivet rocky roman rompy rover rowdy rugby ruler runty rusty sadly sassy savvy scaly scary scoff scone scoop scope scout scamp scene screw sedan sedge seedy shady shark shiny shirk shock shout shrug siege sieve skimp skulk slack slain slant slash sleek sleet slime slimy slink sloop slosh sloth slump slunk slurp smack smear smoke snaky snarl snore snort softy solar sooth sorry spade spare spark spasm speck spiel spike spill spine spunk staid stale stalk stave steal stern stiff stomp storm strap straw stray strip strut stump suede suite surly swamp swarm swept swill swoop taboo talon tango tardy tawny tawse tease tepid terse thane thief thorn throb throw tidal tiger timid topaz topsy torch towel tramp trawl triad trick tripe troth trove truce trump ulcer ultra umber union unite utter vague vapid vault vigor visor vista vixen vogue vomit voter vouch wacky waltz warty waste weary weedy witty woken worse worst wrath wreak wreck wring wrist yappy yield zonal italy world about after again alert alike align alive alley allow alone along alter angel anger angle angry anime annex apart apple apply arena argue arise armor aroma arose array arrow asset atlas attic avoid award aware baker basic basis batch beach began begin being below bench bible birth black blade blame bland blank blast blaze bleed blend bless blind block blood bloom blown blues blunt board bonus boost bound boxer brain brand brave bread break breed brick brief bring broad broke brook brown build built bunch burnt buyer cabin cargo carry cause cease chain chair chaos chase cheap check cheek chess chest chief child civic civil claim clash class clean clear clerk color comic comma coral couch could count court cover crack crane crash crazy cream crime cross crowd crown cruel crush curve daily dance dealt death debut delay delta demon depth devil dirty disco doing doubt dough drain drama drawn dress drink drive drone drove drunk dying early eight elite email empty enemy enjoy enter entry equal error essay every exact extra faith fancy fatal fault feast fence fever field fifth fifty fight final first fixed flash fluid focus force forth found frame frank fraud fresh front frost fruit fully funny gains ghost giant given glass going grace grade grant grasp great green grief grill grind gross group grown guard guide guilt happy harsh haunt haven heart heavy hence herbs honor horse hotel house human humor ideal image imply inner input issue joint judge juice jumpy karma knife knock known label layer learn leave legal level light limit local logic lover lower loyal lucky lunar lunch magic major maker manor march match maybe mayor media metal might minor minus model money month moral mouse mouth movie music named nerve never night noble noise north noted novel nurse occur ocean offer often olive onion opera order other owned owner ozone paint panic paper party patch pause peace peach pearl phase phone photo pilot pixel place plain plane plant plaza point polar power press price pride prime print prior probe prose prove proxy queen query quest quick quiet quota quote radio raise rally range rapid ratio reach ready realm rebel reign relay reply rider right rigid risky rival robot rocky roman rough round route royal ruler rural saint salad sauce scale scene score sedan serve seven shade shake shall shame shape share shark sharp sheep sheet shelf shell shift shine shock shore short shout sight since sixth sixty skill skull slate sleep slice slide slope smart smile smoke snake solid solve south space spare speak speed spend spice spill spoke spoon sport spray squad staff stage stain stake stale stand stark start state stays steam steel steer stick still stock stone storm story stuck study style sugar sunny super surge swear sweep sweet swift swing sworn table taste teach tears teeth there thick thing think third those three threw throw thumb tiger tight timer tired title today token total touch tough tower towel toxic track trade trail train trait trend trial trick tried troop truck trunk trust truth tumor tuned twice twist under unfit unite unity until upper upset urban usage usual valid value valve vapor vault verse video viral virus visit vital vivid voice voter waste watch water weave wedge weird wheel where which while white whole whose witch woman worry worth would write wrong yacht yield young youth zombi japan`.split(/\s+/).filter(w=>w.length===5);
-
-const VALID_WORDS = new Set(RAW.map(w=>w.toUpperCase()));
-const ENDLESS_POOL = [...VALID_WORDS];
-
-// ════════════════════════════════════════════════════════
-//  ENCODE / DECODE  (simple XOR + base36, no crypto needed)
-//  Key is fixed — obscures the word from casual URL inspection
-// ════════════════════════════════════════════════════════
-const SECRET_KEY = [0x4B,0x4E,0x55,0x43,0x4B]; // "KNUCK"
-
-function encodeWord(word) {
-  // XOR each char code with rotating key, then pack as 4-digit hex each = 20 chars
-  const w = word.toUpperCase();
-  let out = '';
-  for (let i = 0; i < w.length; i++) {
-    const xored = w.charCodeAt(i) ^ SECRET_KEY[i % SECRET_KEY.length];
-    out += xored.toString(16).padStart(2,'0');
-  }
-  // add a 2-char checksum (sum of raw chars mod 256)
-  const checksum = w.split('').reduce((a,c)=>a+c.charCodeAt(0),0) % 256;
-  out += checksum.toString(16).padStart(2,'0');
-  return out.toUpperCase();
-}
-
-function decodeCode(code) {
-  const c = code.trim().toUpperCase();
-  if (c.length !== 12) return null; // 5*2 + 2 checksum
-  try {
-    let word = '';
-    for (let i = 0; i < 5; i++) {
-      const byte = parseInt(c.slice(i*2, i*2+2), 16);
-      const char = String.fromCharCode(byte ^ SECRET_KEY[i % SECRET_KEY.length]);
-      if (!/[A-Z]/.test(char)) return null;
-      word += char;
-    }
-    // verify checksum
-    const checksum = word.split('').reduce((a,c)=>a+c.charCodeAt(0),0) % 256;
-    const givenChecksum = parseInt(c.slice(10,12), 16);
-    if (checksum !== givenChecksum) return null;
-    return word;
-  } catch { return null; }
-}
-
-// ════════════════════════════════════════════════════════
-//  GAME STATE
-// ════════════════════════════════════════════════════════
-const WORD_OF_DAY = "JAPAN";
-const MAX_GUESSES = 6, WL = 5;
-
-let state = {
-  word: WORD_OF_DAY, mode: 'daily', // 'daily' | 'endless' | 'challenge'
-  row:0, col:0, guess:[], over:false, guessResults:[],
-};
-
-let stats = JSON.parse(localStorage.getItem('knuckle_stats')||'null') || {
-  played:0,wins:0,streak:0,best:0,dist:{1:0,2:0,3:0,4:0,5:0,6:0}
-};
+// WORD LIST
+const RAW=`cigar rebut sissy humph awry fever lucky steal jumbo lofty awoke taunt siege graze woken creed flood gouge cargo tidal robin stint asked blunt gusts nasty flair shaft clams crimp shake aloof plaid globs fleas whack shire foggy forte piped rumba boxer skied chess flint hound cloak hyper awash swoop jaunt quirk skimp blaze craft gripe pinch mauve skirt limbo booze spell terse clump spurn drank croup throb fought plumb rumor kitty beats holly prank trill given gruel stink ferry farce sauce tacit groan horde gorge taupe sixty slave bleed floss girth botch drawl glean rebel forge gaudy tweed drake hairy wells toxin bleep zonal aping shone epoch shunt gawky blurt sunny dross elope waltz gloat slang spout glint gruff scamp slurp smock yodel spank stark stomp swill taper tithe tryst unfit vicar vouch wring ankle atone beady began bliss blood blown cargo chest claim clasp comet coral crave derby elbow ember feral franc frisk gauze ghoul glade glare gloss gnome graft grail gross grout gully guile gulch haunt heave hefty hoist homer horde hussy hutch hyena igloo index inept inlet inter kabob knife krona kudos lapel large larva leaky leapt liver local lodge logic lowly lucid lusty lyric magic manor manic matte mealy medal mercy messy mogul moldy money monks moose moron morph motto moult mouse mouth mucky muddy mulch mural nasal naval needy nervy noisy notch nymph offal optic orbit parka peace petal petty phase phone phony picky pinky pixel plaza plead plume plunk poach poker poppy porch pouty preen prima primp prize prose prowl proxy prude psalm psych pubic purse quaff qualm quash quasi quell quest queue quick quill quirk quota quote rabbi racer radar rafty rainy rally ranch rapid raven rawly reach retch retro ridge risky rival rivet robot rocky romeo royal ruddy rugby ruler runty rusty sadly sassy satyr sauce savvy seamy sedan seedy serve seven shady shame shark sheep shelf shell shirk shock showy shrug siege sieve silly sinew sixth sixty skimp skull slack slang slant slash sleek slept slick slide slope slurp slyly smack smear smile smock smoke snaky snarl sneer snide sniff snore snort snuff softy solar solid solve sorry spank spare spark spawn spear speck spiel spike spill spine spoof spook spool spout spray spree sprig spunk staid stalk stall stave steal steel stern stiff stile stilt stomp stork storm strap straw stray strip strut stump stunk suede suite sunny surly swamp swarm swear sweat swept swill swipe swoop tabby taboo taffy talon tammy tangy tardy tawny taunt tawse tease tempt terse thief think thorn throb throw thrum timid titan topaz topsy torch towel trace trade trail trait tramp trawl tread treat trend triad tribe trick tried tripe troth trove truce trump tryst tuber tummy tuner turbo twang tweak twice twill swirl trite trout tweed ulcer ultra umbra unify unite unlit utter usual vague vapid vault vaunt visor vista vixen vogue voila voile vomit voter vouch wacky waltz warty waste watch water weary weave weedy weigh weird whiff while whine white whole whose witch wispy woken world wormy worse worst wrath wreak wreck wring wrist wrote abash abase abate abbey abbot abhor abide abound above abuse abyss acted acrid acorn adept admit adobe adore adult agape agile aging aglow agony agree ahead aided aimer aioli aisle allay alley allot allow alloy aloft alone along aloof aloud alpha altar alter amend amiss amuse angel anger angle angry anime annex annoy antsy anvil aorta apple apply aptly ardor arena argot arise armed aroma arson ashen atlas attic audio audit augur avail avert avid avow axial azure bacon bagel baggy balmy banjo baron baste batch bayou beige berth bevel birch bison blimp bloke bloat bored borax brace braid brake brand brash brawn breed briar bride brine brink briny brisk broil brook broth budge buggy bulge bully bunch bunny burly butch bylaw cadet cameo camel carol carom carry caste catch cavil cedar chafe champ chaos chasm cheer chief chive choir choke chore chump churn cinch civet clack clang clank clash cleat cleft clerk click cliff cling cloak clone clout cluck clunk comet comic copse coset cough crack craft crave creep crimp crisp croak croon croup crypt cubby curly curry cycle daddy daily daisy dandy datum daunt deify delta denim depot derby devil diary dirty disco ditty dodge dogma dolly dowdy dowel draft drain drake drawl droll drone drool droop drove drunk dryer dusky dusty dwarf dwell eager early ebony egret elbow ember emcee emery envy equip erupt essay ethyl evade every exact exert extol fable faint fairy farce fazed feast fern ferry fetal fetus fiend fiery fifth filth flair flame flank flint float floor floss flout flown fluff fluke flung flunk flute foamy focal forge foyer franc freak friar frisk fritz frond frost froze fudge fugue fully fungi funny furor gaudy gavel gawky gecko geeky ghoul giddy gleam glean glint gloat gloom glued gnash gorge gouge gourd gravy graze greet grief grime groan groom gross grove growl gruel gruff grunt guava guile gulch gully gusto handy hanky hardy harpy haste heady heist herby heron hippo hippy hoard hoary hokey homer horde horny hotly hubby human humor hunky hurly husky hutch hyena index indie infer inter intro ionic irate islet ivory juicy jumpy juror kayak kebab kinky knave knelt kooky krona lacey laffy lamed lanky larva latch leech leggy lemon letch lewd lingo liver livid loopy lousy lowly lusty madam manly manor maple mauve mealy medal mercy melee melon messy milky minty mirth mocha mogul moldy moody muddy muggy mulch nanny nasty naval needy nervy nifty nippy noisy nutsy nymph oaken oddly offal oiled oldie oozed optic orbit ovoid oxide ozone paddy panda pansy patsy penal penny perky pesky petty phony piano piety pilaf pinky pizza plank plaza plead pleat plonk plotz plumb plume plunk podgy poker polka poppy porch pouty prank prawn primp privy prize prone prowl prude psalm pubic puffy pulpy purge pupil quaff qualm quiff quota rabid ramen randy raven recto regal rerun resin retro rider rigid risky rival rivet rocky roman rompy rover rowdy rugby ruler runty rusty sadly sassy savvy scaly scary scoff scone scoop scope scout scamp scene screw sedan sedge seedy shady shark shiny shirk shock shout shrug siege sieve skimp skulk slack slain slant slash sleek sleet slime slimy slink sloop slosh sloth slump slunk slurp smack smear smoke snaky snarl snore snort softy solar sooth sorry spade spare spark spasm speck spiel spike spill spine spunk staid stale stalk stave steal stern stiff stomp storm strap straw stray strip strut stump suede suite surly swamp swarm swept swill swoop taboo talon tango tardy tawny tawse tease tepid terse thane thief thorn throb throw tidal tiger timid topaz topsy torch towel tramp trawl triad trick tripe troth trove truce trump ulcer ultra umber union unite utter vague vapid vault vigor visor vista vixen vogue vomit voter vouch wacky waltz warty waste weary weedy witty woken worse worst wrath wreak wreck wring wrist yappy yield zonal italy world about after again alert alike align alive alley allow alone along alter angel anger angle angry anime annex apart apple apply arena argue arise armor aroma arose array arrow asset atlas attic avoid award aware baker basic basis batch beach began begin being below bench bible birth black blade blame bland blank blast blaze bleed blend bless blind block blood bloom blown blues blunt board bonus boost bound boxer brain brand brave bread break breed brick brief bring broad broke brook brown build built bunch burnt buyer cabin cargo carry cause cease chain chair chaos chase cheap check cheek chess chest chief child civic civil claim clash class clean clear clerk color comic comma coral couch could count court cover crack crane crash crazy cream crime cross crowd crown cruel crush curve daily dance dealt death debut delay delta demon depth devil dirty disco doing doubt dough drain drama drawn dress drink drive drone drove drunk dying early eight elite email empty enemy enjoy enter entry equal error essay every exact extra faith fancy fatal fault feast fence fever field fifth fifty fight final first fixed flash fluid focus force forth found frame frank fraud fresh front frost fruit fully funny gains ghost giant given glass going grace grade grant grasp great green grief grill grind gross group grown guard guide guilt happy harsh haunt haven heart heavy hence herbs honor horse hotel house human humor ideal image imply inner input issue japan joint judge juice jumpy karma knife knock known label layer learn leave legal level light limit local logic lover lower loyal lucky lunar lunch magic major maker manor march match maybe mayor media metal might minor minus model money month moral mouse mouth movie music named nerve never night noble noise north noted novel nurse occur ocean offer often olive onion opera order other owned owner ozone paint panic paper party patch pause peace peach pearl phase phone photo pilot pixel place plain plane plant plaza point polar power press price pride prime print prior probe prose prove proxy queen query quest quick quiet quota quote radio raise rally range rapid ratio reach ready realm rebel reign relay reply rider right rigid risky rival robot rocky roman rough round route royal ruler rural saint salad sauce scale scene score sedan serve seven shade shake shall shame shape share shark sharp sheep sheet shelf shell shift shine shock shore short shout sight since sixth sixty skill skull slate sleep slice slide slope smart smile smoke snake solid solve south space spare speak speed spend spice spill spoke spoon sport spray squad staff stage stain stake stale stand stark start state stays steam steel steer stick still stock stone storm story stuck study style sugar sunny super surge swear sweep sweet swift swing sworn table taste teach tears teeth there thick thing think third those three threw throw thumb tiger tight timer tired title today token total touch tough tower towel toxic track trade trail train trait trend trial trick tried troop truck trunk trust truth tumor tuned twice twist under unfit unite unity until upper upset urban usage usual valid value valve vapor vault verse video viral virus visit vital vivid voice voter waste watch water weave wedge weird wheel where which while white whole whose witch woman worry worth would write wrong yacht yield young youth zombi japan`.split(/\s+/).filter(w=>w.length===5);
+const VALID_WORDS=new Set(RAW.map(w=>w.toUpperCase()));
+const ALL_WORDS=[...VALID_WORDS];
+const DAILY_POOL="about above abuse actor acute admit adobe adult after again agent agree ahead alarm album alert alike alive alley allow alone along alter angel anger angle angry anime annex apart apple apply arena argue arise armor aroma arose array arrow asset atlas attic avoid award aware baker basic basis batch beach began begin being below bench bible birth black blade blame bland blank blast blaze bleed blend bless blind block blood bloom blown blues blunt board bonus boost bound boxer brain brand brave bread break breed brick brief bring broad broke brook brown build built bunch burnt buyer cabin cargo carry cause cease chain chair chaos chase cheap check cheek chess chest chief child civic civil claim clash class clean clear clerk color comic comma coral couch could count court cover crack crane crash crazy cream crime cross crowd crown cruel crush curve daily dance dealt death debut delay delta demon depth devil dirty disco doing doubt dough drain drama drawn dress drink drive drone drove drunk dying early eight elite email empty enemy enjoy enter entry equal error essay every exact extra faith fancy fatal fault feast fence fever field fifth fifty fight final first fixed flash fluid focus force forth found frame frank fraud fresh front frost fruit fully funny gains ghost giant given glass going grace grade grant grasp great green grief grill grind gross group grown guard guide guilt happy harsh haunt haven heart heavy hence herbs honor horse hotel house human humor ideal image imply inner input issue japan joint judge juice jumpy karma knife knock known label layer learn leave legal level light limit local logic lover lower loyal lucky lunar lunch magic major maker manor march match maybe mayor media metal might minor minus model money month moral mouse mouth movie music named nerve never night noble noise north noted novel nurse occur ocean offer often olive onion opera order other owned owner ozone paint panic paper party patch pause peace peach pearl phase phone photo pilot pixel place plain plane plant plaza point polar power press price pride prime print prior probe prose prove proxy queen query quest quick quiet quota quote radio raise rally range rapid ratio reach ready realm rebel reign relay reply rider right rigid risky rival robot rocky roman rough round route royal ruler rural saint salad sauce scale scene score sedan serve seven shade shake shall shame shape share shark sharp sheep sheet shelf shell shift shine shock shore short shout sight since sixth sixty skill skull slate sleep slice slide slope smart smile smoke snake solid solve south space spare speak speed spend spice spill spoke spoon sport spray squad staff stage stain stake stale stand stark start state stays steam steel steer stick still stock stone storm story stuck study style sugar sunny super surge swear sweep sweet swift swing sworn table taste teach tears teeth there thick thing think third those three threw throw thumb tiger tight timer tired title today token total touch tough tower towel toxic track trade trail train trait trend trial trick tried troop truck trunk trust truth tumor tuned twice twist under unfit unite unity until upper upset urban usage usual valid value valve vapor vault verse video viral virus visit vital vivid voice voter waste watch water weave wedge weird wheel where which while white whole whose witch woman worry worth would write wrong yacht yield young youth".split(" ").filter(w=>w.length===5).map(w=>w.toUpperCase());
+function getDayNumber(){const e=new Date('2024-01-01').getTime(),n=new Date();n.setHours(0,0,0,0);return Math.floor((n.getTime()-e)/(864e5));}
+function getDailyWord(){return DAILY_POOL[getDayNumber()%DAILY_POOL.length];}
+document.getElementById('day-num').textContent=getDayNumber()+1;
+// Encode/decode
+const SK=[0x4B,0x4E,0x55,0x43,0x4B];
+function encodeWord(w){w=w.toUpperCase();let o='';for(let i=0;i<w.length;i++)o+=(w.charCodeAt(i)^SK[i%SK.length]).toString(16).padStart(2,'0');const cs=w.split('').reduce((a,c)=>a+c.charCodeAt(0),0)%256;return(o+cs.toString(16).padStart(2,'0')).toUpperCase();}
+function decodeCode(code){const c=code.trim().toUpperCase().replace(/-/g,'');if(c.length!==12)return null;try{let w='';for(let i=0;i<5;i++){const b=parseInt(c.slice(i*2,i*2+2),16),ch=String.fromCharCode(b^SK[i%SK.length]);if(!/[A-Z]/.test(ch))return null;w+=ch;}const cs=w.split('').reduce((a,c)=>a+c.charCodeAt(0),0)%256;return cs===parseInt(c.slice(10,12),16)?w:null;}catch{return null;}}
+function formatCode(c){return c.match(/.{1,4}/g).join('-');}
+// Sound
+let audioCtx=null,soundEnabled=true;
+function getAC(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playTone(freq,type,dur,gain=0.15,delay=0){if(!soundEnabled)return;try{const ac=getAC(),o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.type=type;o.frequency.setValueAtTime(freq,ac.currentTime+delay);g.gain.setValueAtTime(0,ac.currentTime+delay);g.gain.linearRampToValueAtTime(gain,ac.currentTime+delay+0.01);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+dur);o.start(ac.currentTime+delay);o.stop(ac.currentTime+delay+dur+0.05);}catch(e){}}
+function sndType(){playTone(220,'square',0.06,0.12);}
+function sndDel(){playTone(160,'square',0.05,0.08);}
+function sndInvalid(){playTone(130,'sawtooth',0.18,0.15);playTone(110,'sawtooth',0.12,0.1,0.1);}
+function sndReveal(st,i){const d=i*0.05;if(st==='correct'){playTone(660,'sine',0.15,0.18,d);playTone(880,'sine',0.08,0.1,d+0.07);}else if(st==='present'){playTone(440,'sine',0.12,0.15,d);}else{playTone(200,'triangle',0.06,0.08,d);}}
+function sndWin(){[523,659,784,1047].forEach((f,i)=>playTone(f,'sine',0.3,0.22,i*0.12));}
+function sndLoss(){[300,250,200,150].forEach((f,i)=>playTone(f,'sawtooth',0.2,0.18,i*0.1));}
+// Game state
+const MAX_GUESSES=6,WL=5;
+let hardMode=JSON.parse(localStorage.getItem('knuckle_hard')||'false');
+let state={word:getDailyWord(),mode:'daily',row:0,col:0,guess:[],over:false,guessResults:[],hardRequired:[]};
+let stats=JSON.parse(localStorage.getItem('knuckle_stats')||'null')||{played:0,wins:0,streak:0,best:0,dist:{1:0,2:0,3:0,4:0,5:0,6:0}};
+let lastPlayedDay=parseInt(localStorage.getItem('knuckle_lastday')||'-1');
 function saveStats(){localStorage.setItem('knuckle_stats',JSON.stringify(stats));}
-
-// ════════════════════════════════════════════════════════
-//  PARTICLES
-// ════════════════════════════════════════════════════════
+// Particles
 const canvas=document.getElementById('fx-canvas'),ctx=canvas.getContext('2d');
 let particles=[],animId=null;
-function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
-resizeCanvas();window.addEventListener('resize',resizeCanvas);
-
-function spawnP(x,y,color,count,opts={}){
-  for(let i=0;i<count;i++){
-    const a=(opts.angle||0)+(Math.random()-.5)*(opts.spread||Math.PI*2);
-    const sp=(opts.min||2)+Math.random()*(opts.max||7);
-    particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp+(opts.yb||0),
-      alpha:1,size:(opts.sz||3)+Math.random()*(opts.szv||5),color,
-      shape:Math.random()>.45?'rect':'circle',rot:Math.random()*Math.PI*2,
-      rotS:(Math.random()-.5)*.35,grav:(opts.grav||.2)+Math.random()*.08,
-      decay:(opts.decay||.016)+Math.random()*.012});
-  }
-  if(!animId)loopP();
-}
-function loopP(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles=particles.filter(p=>p.alpha>.01);
-  for(const p of particles){
-    p.x+=p.vx;p.y+=p.vy;p.vy+=p.grav;p.vx*=.985;
-    p.alpha-=p.decay;p.rot+=p.rotS;
-    ctx.save();ctx.globalAlpha=Math.max(0,p.alpha);ctx.fillStyle=p.color;
-    ctx.translate(p.x,p.y);ctx.rotate(p.rot);
-    if(p.shape==='rect')ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*.55);
-    else{ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill();}
-    ctx.restore();
-  }
-  if(particles.length)animId=requestAnimationFrame(loopP);
-  else{animId=null;ctx.clearRect(0,0,canvas.width,canvas.height);}
-}
-function burstFromTile(tile,st){
-  const r=tile.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-  const C=getComputedStyle(document.documentElement);
-  if(st==='correct'){
-    spawnP(cx,cy,C.getPropertyValue('--correct').trim()||'#4a9e6b',22,{min:2,max:8,sz:4,szv:8});
-    spawnP(cx,cy,'#a8f0c0',10,{min:1,max:5,sz:2,szv:3});
-    spawnP(cx,cy,'#fff',5,{min:3,max:10,sz:2,szv:2});
-  } else if(st==='present'){
-    spawnP(cx,cy,C.getPropertyValue('--present').trim()||'#c9933a',10,{min:1,max:5,sz:3,szv:4});
-    spawnP(cx,cy,'#f0d090',5,{min:1,max:4,sz:2,szv:2});
-  } else {
-    spawnP(cx,cy,'#555',4,{min:1,max:3,sz:2,szv:2,decay:.05});
-  }
-}
-function bigWinBurst(tileEls){
-  tileEls.forEach((tile,i)=>setTimeout(()=>{
-    const r=tile.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-    const C=getComputedStyle(document.documentElement);
-    spawnP(cx,cy,C.getPropertyValue('--correct').trim()||'#4a9e6b',45,{min:3,max:12,sz:4,szv:8});
-    spawnP(cx,cy,'#a8f0c0',25,{min:2,max:8,sz:2,szv:4});
-    spawnP(cx,cy,'#fff',15,{min:4,max:14,sz:2,szv:3});
-    spawnP(cx,cy,'#e63946',10,{min:2,max:7,sz:3,szv:5});
-  },i*110));
-}
-function screenFlash(color,opacity=.18){
-  const el=document.createElement('div');
-  Object.assign(el.style,{position:'fixed',inset:0,background:color,opacity,
-    pointerEvents:'none',zIndex:60,transition:'opacity .55s ease'});
-  document.body.appendChild(el);
-  requestAnimationFrame(()=>{el.style.opacity=0;setTimeout(()=>el.remove(),700);});
-}
-
-// ════════════════════════════════════════════════════════
-//  GRID
-// ════════════════════════════════════════════════════════
+function rC(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+rC();window.addEventListener('resize',rC);
+function spawnP(x,y,color,count,opts={}){for(let i=0;i<count;i++){const a=(opts.angle||0)+(Math.random()-.5)*(opts.spread||Math.PI*2),sp=(opts.min||2)+Math.random()*(opts.max||7);particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp+(opts.yb||0),alpha:1,size:(opts.sz||3)+Math.random()*(opts.szv||5),color,shape:Math.random()>.45?'rect':'circle',rot:Math.random()*Math.PI*2,rotS:(Math.random()-.5)*.35,grav:(opts.grav||.2)+Math.random()*.08,decay:(opts.decay||.016)+Math.random()*.012});}if(!animId)loopP();}
+function loopP(){ctx.clearRect(0,0,canvas.width,canvas.height);particles=particles.filter(p=>p.alpha>.01);for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=p.grav;p.vx*=.985;p.alpha-=p.decay;p.rot+=p.rotS;ctx.save();ctx.globalAlpha=Math.max(0,p.alpha);ctx.fillStyle=p.color;ctx.translate(p.x,p.y);ctx.rotate(p.rot);if(p.shape==='rect')ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*.55);else{ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill();}ctx.restore();}if(particles.length)animId=requestAnimationFrame(loopP);else{animId=null;ctx.clearRect(0,0,canvas.width,canvas.height);}}
+function burstFromTile(tile,st){const r=tile.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,C=getComputedStyle(document.documentElement);if(st==='correct'){spawnP(cx,cy,C.getPropertyValue('--correct').trim()||'#4a9e6b',20,{min:2,max:8,sz:4,szv:7});spawnP(cx,cy,'#a8f0c0',8,{min:1,max:5,sz:2,szv:3});spawnP(cx,cy,'#fff',4,{min:3,max:10,sz:2,szv:2});}else if(st==='present'){spawnP(cx,cy,C.getPropertyValue('--present').trim()||'#c9933a',9,{min:1,max:5,sz:3,szv:4});}else{spawnP(cx,cy,'#555',3,{min:1,max:3,sz:2,szv:2,decay:.06});}}
+function bigWinBurst(els){els.forEach((tile,i)=>setTimeout(()=>{const r=tile.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,C=getComputedStyle(document.documentElement);spawnP(cx,cy,C.getPropertyValue('--correct').trim()||'#4a9e6b',40,{min:3,max:12,sz:4,szv:8});spawnP(cx,cy,'#a8f0c0',20,{min:2,max:8,sz:2,szv:4});spawnP(cx,cy,'#fff',12,{min:4,max:14,sz:2,szv:3});spawnP(cx,cy,'#e63946',8,{min:2,max:7,sz:3,szv:5});},i*110));}
+function screenFlash(color,opacity=.18){const el=document.createElement('div');Object.assign(el.style,{position:'fixed',inset:0,background:color,opacity,pointerEvents:'none',zIndex:60,transition:'opacity .55s ease'});document.body.appendChild(el);requestAnimationFrame(()=>{el.style.opacity=0;setTimeout(()=>el.remove(),700);});}
+// Grid
 const gridEl=document.getElementById('grid');
 let tiles=[];
-function buildGrid(){
-  gridEl.innerHTML='';tiles=[];
-  for(let r=0;r<MAX_GUESSES;r++){
-    const row=document.createElement('div');row.className='row';
-    tiles[r]=[];
-    for(let c=0;c<WL;c++){
-      const t=document.createElement('div');t.className='tile';
-      row.appendChild(t);tiles[r][c]=t;
-    }
-    gridEl.appendChild(row);
-  }
-}
+function buildGrid(){gridEl.innerHTML='';tiles=[];gridEl.className='';for(let r=0;r<MAX_GUESSES;r++){const row=document.createElement('div');row.className='row'+(r===0?' active-row':'');tiles[r]=[];for(let c=0;c<WL;c++){const t=document.createElement('div');t.className='tile intro';t.style.animationDelay=`${(r*WL+c)*0.03}s`;row.appendChild(t);tiles[r][c]=t;}gridEl.appendChild(row);}}
 buildGrid();
-
-// ════════════════════════════════════════════════════════
-//  KEYBOARD
-// ════════════════════════════════════════════════════════
+// Keyboard
 const KB_ROWS=[['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['ENTER','Z','X','C','V','B','N','M','⌫']];
-const kbEl=document.getElementById('keyboard');
-let keyMap={};
-function buildKeyboard(){
-  kbEl.innerHTML='';keyMap={};
-  KB_ROWS.forEach(row=>{
-    const rowEl=document.createElement('div');rowEl.className='kb-row';
-    row.forEach(k=>{
-      const btn=document.createElement('button');
-      btn.className='key'+(k.length>1?' wide':'');
-      btn.textContent=k;btn.dataset.key=k;
-      btn.addEventListener('click',()=>handleKey(k));
-      rowEl.appendChild(btn);keyMap[k]=btn;
-    });
-    kbEl.appendChild(rowEl);
-  });
-}
+const kbEl=document.getElementById('keyboard');let keyMap={};
+function buildKeyboard(){kbEl.innerHTML='';keyMap={};KB_ROWS.forEach(row=>{const rowEl=document.createElement('div');rowEl.className='kb-row';row.forEach(k=>{const btn=document.createElement('button');btn.className='key'+(k.length>1?' wide':'');btn.textContent=k;btn.addEventListener('click',()=>handleKey(k));rowEl.appendChild(btn);keyMap[k]=btn;});kbEl.appendChild(rowEl);});}
 buildKeyboard();
-
-// ════════════════════════════════════════════════════════
-//  TOAST
-// ════════════════════════════════════════════════════════
+// Toast
 let toastTimer;
-function showToast(msg,ms=1900,err=false){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.toggle('error',err);
-  t.classList.remove('show');void t.offsetWidth;t.classList.add('show');
-  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),ms);
-}
-
-// ════════════════════════════════════════════════════════
-//  INPUT
-// ════════════════════════════════════════════════════════
-document.addEventListener('keydown',e=>{
-  if(document.getElementById('stats-modal').classList.contains('open'))return;
-  if(document.getElementById('challenge-modal').classList.contains('open'))return;
-  if(state.over)return;
-  if(e.key==='Enter')handleKey('ENTER');
-  else if(e.key==='Backspace')handleKey('⌫');
-  else if(/^[a-zA-Z]$/.test(e.key))handleKey(e.key.toUpperCase());
-});
-
-function handleKey(k){
-  if(state.over)return;
-  if(k==='⌫')deleteLetter();
-  else if(k==='ENTER')submitGuess();
-  else if(/^[A-Z]$/.test(k)&&state.col<WL)addLetter(k);
-}
-function addLetter(l){
-  if(state.col>=WL)return;
-  state.guess[state.col]=l;
-  const tile=tiles[state.row][state.col];
-  tile.textContent=l;
-  tile.classList.remove('pop');void tile.offsetWidth;tile.classList.add('pop');
-  state.col++;
-}
-function deleteLetter(){
-  if(!state.col)return;
-  state.col--;state.guess[state.col]=null;
-  const tile=tiles[state.row][state.col];
-  tile.textContent='';tile.classList.remove('pop');
-}
-function submitGuess(){
-  if(state.col<WL){showToast('Not enough letters',1600,true);invalidRow(state.row);return;}
-  const guess=state.guess.join('');
-  if(!VALID_WORDS.has(guess)){showToast(`"${guess}" — not in word list`,2000,true);invalidRow(state.row);return;}
-  const result=evaluate(guess);
-  state.guessResults.push({guess,result});
-  revealRow(state.row,result,guess);
-}
-function evaluate(guess){
-  const res=Array(WL).fill('absent');
-  const wa=state.word.split(''),ga=guess.split(''),used=Array(WL).fill(false);
-  for(let i=0;i<WL;i++)if(ga[i]===wa[i]){res[i]='correct';used[i]=true;}
-  for(let i=0;i<WL;i++){
-    if(res[i]==='correct')continue;
-    for(let j=0;j<WL;j++){
-      if(!used[j]&&ga[i]===wa[j]&&res[j]!=='correct'){res[i]='present';used[j]=true;break;}
-    }
-  }
-  return res;
-}
-
-// ════════════════════════════════════════════════════════
-//  REVEAL
-// ════════════════════════════════════════════════════════
-function revealRow(row,result,guess){
-  const HALF=230,STAGGER=310;
-  result.forEach((st,i)=>{
-    const tile=tiles[row][i];
-    setTimeout(()=>{
-      tile.style.transition=`transform ${HALF}ms cubic-bezier(.4,0,.6,1)`;
-      tile.style.transform='rotateX(-90deg) scaleY(.6)';
-      setTimeout(()=>{
-        tile.classList.add(st,'scan');
-        tile.style.transition=`transform ${HALF}ms cubic-bezier(.2,1,.4,1)`;
-        tile.style.transform='rotateX(0deg) scaleY(1)';
-        burstFromTile(tile,st);
-        updateKey(guess[i],st);
-        if(st==='correct')setTimeout(()=>tile.classList.add('glowing'),HALF);
-      },HALF);
-    },i*STAGGER);
-  });
-
-  const done=(WL-1)*STAGGER+HALF*2+120;
-  setTimeout(()=>{
-    const won=result.every(r=>r==='correct');
-    state.row++;state.guess=[];state.col=0;
-    if(won){
-      state.over=true;
-      if(state.mode!=='challenge'){
-        stats.played++;stats.wins++;stats.streak++;
-        if(stats.streak>stats.best)stats.best=stats.streak;
-        stats.dist[String(state.row)]=(stats.dist[String(state.row)]||0)+1;
-        saveStats();updateStreakBar();
-      }
-      const msgs=['INSANE!','SAVAGE!','CLEAN!','KNUCKLES UP!','SOLID.','LUCKY...'];
-      tiles[row].forEach((t,i)=>setTimeout(()=>t.classList.add('win-bounce'),i*75));
-      setTimeout(()=>{
-        bigWinBurst(tiles[row]);screenFlash('#4a9e6b',.18);
-        showToast(msgs[Math.min(state.row-1,5)],2400);
-        setTimeout(()=>showEndScreen(true),1900);
-      },550);
-    } else if(state.row>=MAX_GUESSES){
-      state.over=true;
-      if(state.mode!=='challenge'){
-        stats.played++;stats.streak=0;saveStats();updateStreakBar();
-      }
-      setTimeout(()=>dramaticLoss(()=>showEndScreen(false)),300);
-    }
-  },done);
-}
-
-function invalidRow(row){
-  tiles[row].forEach(t=>{
-    t.classList.remove('invalid','shake');void t.offsetWidth;
-    t.classList.add('invalid');
-    t.addEventListener('animationend',()=>t.classList.remove('invalid','shake'),{once:true});
-  });
-}
-function dramaticLoss(cb){
-  screenFlash('#e63946',.2);
-  tiles.forEach((rowTiles,ri)=>rowTiles.forEach((tile,ci)=>
-    setTimeout(()=>tile.classList.add('loss-drop'),ri*60+ci*30)));
-  setTimeout(cb,900);
-}
-
+function showToast(msg,ms=1900,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='';if(type)t.classList.add(type);t.classList.remove('show');void t.offsetWidth;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),ms);}
+// Tension
+function updateTension(){const bar=document.getElementById('tension-bar'),fill=document.getElementById('tension-fill'),rem=MAX_GUESSES-state.row;if(state.row===0||state.over){bar.classList.remove('show','critical');fill.style.width='0%';gridEl.classList.remove('tension-2','tension-1');return;}bar.classList.add('show');fill.style.width=Math.round(state.row/MAX_GUESSES*100)+'%';if(rem<=1){bar.classList.add('critical');gridEl.classList.remove('tension-2');gridEl.classList.add('tension-1');}else if(rem<=2){bar.classList.remove('critical');gridEl.classList.add('tension-2');gridEl.classList.remove('tension-1');}else{bar.classList.remove('critical','tension-2','tension-1');gridEl.classList.remove('tension-2','tension-1');}}
+// Input
+document.addEventListener('keydown',e=>{if(document.querySelector('.modal-overlay.open'))return;if(state.over)return;if(e.key==='Enter')handleKey('ENTER');else if(e.key==='Backspace')handleKey('⌫');else if(/^[a-zA-Z]$/.test(e.key))handleKey(e.key.toUpperCase());});
+function handleKey(k){if(state.over)return;if(k==='⌫')deleteLetter();else if(k==='ENTER')submitGuess();else if(/^[A-Z]$/.test(k)&&state.col<WL)addLetter(k);}
+function addLetter(l){if(state.col>=WL)return;state.guess[state.col]=l;const tile=tiles[state.row][state.col];tile.textContent=l;tile.classList.add('filled');tile.classList.remove('pop');void tile.offsetWidth;tile.classList.add('pop');state.col++;sndType();}
+function deleteLetter(){if(!state.col)return;state.col--;state.guess[state.col]=null;const tile=tiles[state.row][state.col];tile.textContent='';tile.classList.remove('pop','filled');sndDel();}
+// Hard mode
+function checkHardMode(guess){for(const req of state.hardRequired){if(req.pos!==null){if(guess[req.pos]!==req.letter)return`Position ${req.pos+1} must be ${req.letter}`;}else{if(!guess.includes(req.letter))return`Guess must contain ${req.letter}`;}}return null;}
+function updateHardRequired(guess,result){result.forEach((st,i)=>{const letter=guess[i];if(st==='correct'){if(!state.hardRequired.find(r=>r.pos===i&&r.letter===letter))state.hardRequired.push({letter,pos:i});}else if(st==='present'){if(!state.hardRequired.find(r=>r.letter===letter&&r.pos===null))state.hardRequired.push({letter,pos:null});}});}
+// Submit
+function submitGuess(){if(state.col<WL){showToast('Not enough letters',1600,'error');invalidRow(state.row);sndInvalid();return;}const guess=state.guess.join('');if(!VALID_WORDS.has(guess)){showToast(`"${guess}" — not in word list`,2000,'error');invalidRow(state.row);sndInvalid();return;}if(hardMode&&state.mode!=='challenge'){const err=checkHardMode(guess);if(err){showToast(err,2200,'warn');invalidRow(state.row);sndInvalid();return;}}const result=evaluate(guess);if(hardMode)updateHardRequired(guess,result);state.guessResults.push({guess,result});revealRow(state.row,result,guess);}
+function evaluate(guess){const res=Array(WL).fill('absent'),wa=state.word.split(''),ga=guess.split(''),used=Array(WL).fill(false);for(let i=0;i<WL;i++)if(ga[i]===wa[i]){res[i]='correct';used[i]=true;}for(let i=0;i<WL;i++){if(res[i]==='correct')continue;for(let j=0;j<WL;j++){if(!used[j]&&ga[i]===wa[j]&&res[j]!=='correct'){res[i]='present';used[j]=true;break;}}}return res;}
+// Reveal
+function revealRow(row,result,guess){const HALF=220,STAGGER=300;gridEl.querySelectorAll('.row').forEach(r=>r.classList.remove('active-row'));result.forEach((st,i)=>{const tile=tiles[row][i];setTimeout(()=>{tile.style.transition=`transform ${HALF}ms cubic-bezier(.4,0,.6,1)`;tile.style.transform='rotateX(-90deg) scaleY(.6)';setTimeout(()=>{tile.classList.add(st,'scan');tile.style.transition=`transform ${HALF}ms cubic-bezier(.2,1,.4,1)`;tile.style.transform='rotateX(0deg) scaleY(1)';burstFromTile(tile,st);updateKey(guess[i],st);sndReveal(st,i);if(st==='correct')setTimeout(()=>tile.classList.add('glowing'),HALF);},HALF);},i*STAGGER);});const done=(WL-1)*STAGGER+HALF*2+120;setTimeout(()=>{const won=result.every(r=>r==='correct');state.row++;state.guess=[];state.col=0;updateTension();if(!won&&state.row<MAX_GUESSES)gridEl.querySelectorAll('.row')[state.row]?.classList.add('active-row');if(won){state.over=true;if(state.mode!=='challenge'){const day=getDayNumber();if(!(state.mode==='daily'&&day===lastPlayedDay)){if(state.mode==='daily'){localStorage.setItem('knuckle_lastday',day);lastPlayedDay=day;}stats.played++;stats.wins++;stats.streak++;if(stats.streak>stats.best)stats.best=stats.streak;stats.dist[String(state.row)]=(stats.dist[String(state.row)]||0)+1;saveStats();}updateStreakBar();}const msgs=['INSANE!','SAVAGE!','CLEAN!','KNUCKLES UP!','SOLID.','LUCKY...'];tiles[row].forEach((t,i)=>setTimeout(()=>t.classList.add('win-bounce'),i*75));setTimeout(()=>{bigWinBurst(tiles[row]);screenFlash('#4a9e6b',.18);sndWin();showToast(msgs[Math.min(state.row-1,5)],2400);setTimeout(()=>showEndScreen(true),1900);},550);}else if(state.row>=MAX_GUESSES){state.over=true;if(state.mode!=='challenge'){const day=getDayNumber();if(!(state.mode==='daily'&&day===lastPlayedDay)){if(state.mode==='daily'){localStorage.setItem('knuckle_lastday',day);lastPlayedDay=day;}stats.played++;stats.streak=0;saveStats();}updateStreakBar();}setTimeout(()=>{sndLoss();dramaticLoss(()=>showEndScreen(false));},300);}},done);}
+function invalidRow(row){tiles[row].forEach(t=>{t.classList.remove('invalid','shake');void t.offsetWidth;t.classList.add('invalid');t.addEventListener('animationend',()=>t.classList.remove('invalid','shake'),{once:true});});}
+function dramaticLoss(cb){screenFlash('#e63946',.2);tiles.forEach((rt,ri)=>rt.forEach((tile,ci)=>setTimeout(()=>tile.classList.add('loss-drop'),ri*60+ci*30)));setTimeout(cb,900);}
 const kPrio={correct:3,present:2,absent:1},kState={};
-function updateKey(letter,st){
-  if(!kPrio[st]||(kState[letter]&&kPrio[kState[letter]]>=kPrio[st]))return;
-  kState[letter]=st;
-  const btn=keyMap[letter];if(!btn)return;
-  btn.classList.remove('correct','present','absent','just-revealed');
-  btn.classList.add(st);void btn.offsetWidth;btn.classList.add('just-revealed');
-  btn.addEventListener('animationend',()=>btn.classList.remove('just-revealed'),{once:true});
-}
-
-// ════════════════════════════════════════════════════════
-//  END SCREEN
-// ════════════════════════════════════════════════════════
-function showEndScreen(won){
-  gridEl.style.display='none';
-  const es=document.getElementById('end-screen');es.classList.add('show');
-  document.getElementById('end-label').textContent=won?'You got it!':'The word was';
-  document.getElementById('end-word').textContent=state.word;
-
-  const isChallenge = state.mode==='challenge';
-  const isEndless   = state.mode==='endless';
-
-  document.getElementById('end-msg').textContent=won
-    ?(isChallenge?`Solved in ${state.row} ${state.row===1?'guess':'guesses'}! Challenge complete.`
-      :`Solved in ${state.row} ${state.row===1?'guess':'guesses'}.${isEndless?' Play again below!':' Come back tomorrow.'}`)
-    :(isChallenge?`The word was ${state.word}. Better luck next time!`
-      :`The answer was ${state.word}.${isEndless?' Try again!':' Come back tomorrow.'}`);
-
-  document.getElementById('btn-replay').style.display         = isEndless?'block':'none';
-  document.getElementById('btn-challenge-again').style.display= isChallenge?'block':'none';
-}
-
-// ════════════════════════════════════════════════════════
-//  SHARE
-// ════════════════════════════════════════════════════════
+function updateKey(letter,st){if(!kPrio[st]||(kState[letter]&&kPrio[kState[letter]]>=kPrio[st]))return;kState[letter]=st;const btn=keyMap[letter];if(!btn)return;btn.classList.remove('correct','present','absent','just-revealed');btn.classList.add(st);void btn.offsetWidth;btn.classList.add('just-revealed');btn.addEventListener('animationend',()=>btn.classList.remove('just-revealed'),{once:true});}
+// Definitions
+const DEFS={JAPAN:"An island nation in East Asia, known for its culture, technology and cuisine.",ABOUT:"Concerning; approximately.",ABOVE:"At a higher level or position.",AFTER:"Following in time or order.",AGAIN:"Another time; once more.",APPLE:"A round fruit with crisp flesh, often red, green, or yellow.",BEACH:"A sandy or pebbly shore by the sea.",BLACK:"The darkest colour, absorbing all light.",BLAST:"A violent gust of air or an explosion.",BLAZE:"A large, fiercely burning fire.",BLIND:"Unable to see.",BLOOD:"The red fluid circulating through the body.",BRAIN:"The organ of thought, housed inside the skull.",BRAND:"A type of product made by a company; a trademark.",BREAD:"A staple food made from flour, water and yeast.",BREAK:"To separate into pieces by force.",BRING:"To carry or take something to a place.",BUILD:"To construct by assembling parts.",CHAIR:"A seat with a back and usually four legs.",CHAOS:"Complete disorder and confusion.",CHASE:"To follow rapidly in order to catch.",CHEAP:"Low in price; inexpensive.",CHESS:"A strategy board game played between two players.",CHILD:"A young human being.",CLEAN:"Free from dirt or impurity.",CLEAR:"Easy to see through; without obstruction.",CORAL:"Marine organisms that form colourful reef structures.",CRACK:"A narrow break or split in a surface.",CRASH:"A violent collision or sudden loud noise.",CREAM:"The fatty part of milk; a pale yellowish-white colour.",CRIME:"An act that violates the law.",CROWD:"A large number of people gathered together.",CRUEL:"Causing pain or suffering deliberately.",CRUSH:"To press with great force so as to break.",CURVE:"A line that bends smoothly.",DAILY:"Happening every day.",DANCE:"To move rhythmically, usually to music.",DEATH:"The end of life.",DOUBT:"A feeling of uncertainty or lack of conviction.",DRAIN:"To draw liquid away gradually.",DRAMA:"A play for theatre or TV; tense events.",DRINK:"To swallow liquid.",DRIVE:"To operate a vehicle; strong motivation.",EARLY:"Before the expected or usual time.",EIGHT:"The number 8.",EMPTY:"Containing nothing.",ENEMY:"A person actively hostile to another.",ENJOY:"To take pleasure in something.",ENTER:"To come or go into a place.",EQUAL:"The same in size, quantity, or value.",ERROR:"A mistake or inaccuracy.",ESSAY:"A short piece of writing on a subject.",EXACT:"Perfectly accurate and correct.",EXTRA:"More than is usual or expected.",FAITH:"Strong belief or trust; religious conviction.",FATAL:"Causing death.",FAULT:"A mistake; a defect; geological crack.",FEAST:"A large and elaborate meal; a celebration.",FENCE:"A barrier made of posts and wire or wood.",FEVER:"An abnormally high body temperature.",FIGHT:"To engage in combat; a struggle.",FINAL:"Last in a series; the decisive stage.",FIRST:"Before all others in order or rank.",FLASH:"A sudden brief burst of light.",FLUID:"A substance that flows; adaptable.",FOCUS:"Centre of attention; to concentrate.",FORCE:"Strength or power; to compel.",FRAME:"A rigid border or structure surrounding something.",FRESH:"Recently made or obtained; not stale.",FRONT:"The forward part or face of something.",FROST:"Ice crystals forming on surfaces in cold weather.",FRUIT:"The seed-bearing part of a plant; result of effort.",GHOST:"The spirit of a dead person.",GIANT:"An imaginary being of great size; something very large.",GLASS:"Hard transparent material; a drinking vessel.",GRACE:"Elegance of movement; divine favour.",GRANT:"To give or allow something requested.",GREAT:"Of an extent, intensity, or importance.",GREEN:"The colour of grass and leaves.",GRIEF:"Deep sorrow, especially from bereavement.",GROSS:"Unacceptably large; revolting; total before deductions.",GROUP:"A number of people or things together.",HAPPY:"Feeling pleasure and contentment.",HEART:"The organ pumping blood; the centre of emotion.",HEAVY:"Of great weight; serious or intense.",HERBS:"Plants used in cooking or medicine.",HONOR:"High respect; to regard with great esteem.",HORSE:"A large four-legged animal used for riding.",HOTEL:"A commercial establishment providing lodging.",HOUSE:"A building for people to live in.",HUMAN:"Relating to people; a person.",HUMOR:"The quality of being amusing; mood.",IMAGE:"A representation of something; a mental picture.",INNER:"Located inside; relating to the mind or spirit.",ISSUE:"An important topic; to supply or distribute officially.",JAPAN:"An island nation in East Asia.",JOINT:"A point where two parts are joined; shared.",JUDGE:"A person who makes legal decisions; to evaluate.",JUICE:"The liquid from fruits or vegetables.",KARMA:"The sum of one's actions affecting their future fate.",KNIFE:"A cutting instrument with a blade and handle.",KNOCK:"To strike a surface; an impact.",LABEL:"A piece of paper or tag attached to identify something.",LAYER:"A sheet or thickness of material.",LEARN:"To acquire knowledge or skill.",LEAVE:"To go away from; remaining.",LEGAL:"Permitted or required by law.",LEVEL:"A horizontal plane; a degree of rank or difficulty.",LIGHT:"Electromagnetic radiation visible to the eye; not heavy.",LIMIT:"A point beyond which something cannot go.",LOCAL:"Relating to a particular area.",LOGIC:"Systematic reasoning; the science of valid inference.",LUCKY:"Having good fortune.",LUNAR:"Relating to the moon.",LUNCH:"A meal eaten in the middle of the day.",MAGIC:"Supernatural power; conjuring tricks; wonderful.",MAJOR:"Important; greater; a higher military rank.",MAKER:"A person or thing that creates something.",MARCH:"To walk in a military manner; the third month.",MATCH:"A contest; a stick for lighting fire; to correspond.",MAYBE:"Perhaps; possibly.",MEDIA:"The main means of mass communication.",METAL:"A hard, shiny material like iron, gold, or steel.",MIGHT:"Great strength or power; past tense of may.",MINOR:"Less important; a person under legal age.",MODEL:"A representation; a person who poses for artists.",MONEY:"A medium of exchange; currency.",MONTH:"One of twelve divisions of the year.",MORAL:"Concerned with right and wrong; a lesson.",MOUSE:"A small rodent; a computer input device.",MOUTH:"The opening used for eating and speaking.",MOVIE:"A film shown in cinemas or on screens.",MUSIC:"Vocal or instrumental sounds arranged artfully.",NIGHT:"The period of darkness between sunset and sunrise.",NOBLE:"Of high moral principles; belonging to aristocracy.",NOISE:"A sound, especially a loud unpleasant one.",NORTH:"The direction toward the North Pole.",NOVEL:"A book-length work of fiction; new and original.",NURSE:"A person trained to care for the sick and injured.",OCEAN:"A vast body of salt water covering most of Earth.",OFFER:"To present for acceptance; a proposal.",OPERA:"A dramatic work set entirely or mainly to music.",ORDER:"A command; an arrangement; a request for goods.",PAINT:"A coloured liquid applied to surfaces; to apply it.",PANIC:"Sudden overwhelming fear causing loss of reason.",PAPER:"Thin material for writing, printing, or wrapping.",PARTY:"A social gathering; a political group.",PAUSE:"A temporary stop in action or speech.",PEACE:"Freedom from war, conflict, or disturbance.",PEARL:"A hard shiny sphere formed inside an oyster.",PHASE:"A distinct period or stage in a process.",PHONE:"A telephone device.",PHOTO:"A picture taken with a camera.",PILOT:"A person who flies an aircraft.",PIXEL:"The smallest unit of a digital image.",PLACE:"A particular position, area, or location.",PLAIN:"Simple; ordinary; a flat area of land.",PLANE:"An aircraft; a flat surface; a tool for smoothing.",PLANT:"A living organism that grows in the ground.",PLAZA:"A public square or marketplace.",POINT:"A sharp tip; a location; a unit of scoring.",POLAR:"Relating to the North or South Pole.",POWER:"The ability to act; energy; authority.",PRESS:"To push firmly; news media collectively.",PRICE:"The amount of money expected for something.",PRIDE:"Satisfaction from one's achievements; a group of lions.",PRIME:"Most important; a prime number; the best stage.",PRINT:"To produce text or images on paper.",PROBE:"An investigation; a device for exploring.",PROSE:"Written language in ordinary form, not verse.",PROVE:"To demonstrate the truth of something.",QUEEN:"A female monarch; a chess piece.",QUERY:"A question; a request for information.",QUEST:"A long search for something important.",QUICK:"Done in a short time; moving fast.",QUIET:"Making little or no noise.",RADIO:"Transmission of sound by electromagnetic waves.",RAISE:"To lift to a higher position; to increase.",RALLY:"A mass meeting; to recover strength.",RANGE:"The area of variation; a line of mountains; a stove.",RAPID:"Happening in a short time; fast.",RATIO:"The relationship between two amounts.",REACH:"To stretch out to get something; to arrive at.",READY:"Prepared and available for action.",REALM:"A kingdom; a field of activity or interest.",REBEL:"A person who resists authority or convention.",REIGN:"The period of a monarch's rule.",RELAY:"To pass on; a race with stages.",REPLY:"A response to a question or statement.",RIGHT:"Correct; the direction opposite to left; a moral claim.",RISKY:"Involving risk or potential danger.",RIVAL:"A competitor; a person competing for the same goal.",ROBOT:"A machine that performs tasks automatically.",ROCKY:"Full of or resembling rocks; unstable.",ROUGH:"Not smooth; approximately; harsh.",ROUND:"Circular in shape; one stage of a competition.",ROUTE:"A way from one place to another.",ROYAL:"Relating to a king or queen.",RULER:"A person who governs; a measuring instrument.",RURAL:"In or relating to the countryside.",SAINT:"A holy person recognised by a church.",SALAD:"A dish of raw vegetables, often with dressing.",SAUCE:"A liquid condiment served with food.",SCALE:"A measuring instrument; to climb; a series of notes.",SCENE:"The place where something occurs; a section of a play.",SCORE:"The total points in a game; to achieve points.",SERVE:"To work for; to deliver food; to be useful.",SHADE:"Comparative darkness; a slight variation of colour.",SHAKE:"To move rapidly back and forth.",SHAPE:"The external form or outline of something.",SHARE:"To divide between people; a unit of ownership.",SHARP:"Having a cutting edge; perceptive; a musical notation.",SHELF:"A flat horizontal surface for storing objects.",SHELL:"A hard protective outer covering.",SHIFT:"To move from one place to another; a period of work.",SHINE:"To emit or reflect light; to excel.",SHOCK:"A sudden emotional disturbance; electric discharge.",SHORT:"Small in length or height; brief.",SIGHT:"The faculty of seeing; something seen.",SKILL:"The ability to do something well, developed by practice.",SLEEP:"A natural periodic state of rest for the body.",SLICE:"A thin flat piece cut from something.",SLIDE:"To move smoothly over a surface.",SLOPE:"A surface at an angle to the horizontal.",SMART:"Having intelligence; well-dressed; feeling sharp pain.",SMILE:"A pleased or amused facial expression.",SMOKE:"Visible vapour from burning material.",SNAKE:"A limbless scaly reptile.",SOLID:"Firm and stable; not liquid or gas; reliable.",SOLVE:"To find the answer to a problem.",SOUTH:"The direction toward the South Pole.",SPACE:"A continuous area; the universe beyond Earth's atmosphere.",SPARE:"Additional; to refrain from harming; a spare tyre.",SPEAK:"To say words aloud; to communicate.",SPEED:"The rate at which someone or something moves.",SPEND:"To pay out money; to pass time.",SPINE:"The backbone; the rear edge of a book.",SPOON:"An eating utensil with a shallow bowl.",SPORT:"Activity involving physical exertion and skill.",SQUAD:"A small group organised for a particular purpose.",STAFF:"The employees of an organisation; a stick.",STAGE:"A raised platform; a period in development.",STAND:"To be in an upright position; a structure for support.",STARK:"Severe or bare; complete and sheer.",START:"To begin; the point at which something begins.",STATE:"A condition; a country or territory; to declare.",STEAM:"Water vapour; to cook using steam.",STEEL:"A strong alloy of iron and carbon.",STICK:"A thin piece of wood; to adhere or fasten.",STILL:"Not moving; up to the present time; a photograph.",STOCK:"A supply kept for use; livestock; financial shares.",STONE:"Rock; a small piece of rock; a unit of weight.",STORM:"A violent weather disturbance.",STORY:"An account of events; a floor of a building.",STUCK:"Fixed in position; unable to move forward.",STUDY:"Devoted learning; a room for reading and writing.",STYLE:"A distinctive manner of doing something.",SUGAR:"A sweet crystalline carbohydrate.",SUNNY:"Bright with sunlight and warmth.",SUPER:"Excellent; above normal; a prefix meaning above.",SURGE:"A sudden powerful forward movement or increase.",SWEAR:"To make a solemn promise; to use profanity.",SWEET:"Having the pleasant taste of sugar; kind.",SWIFT:"Moving very fast; a type of bird.",SWING:"To move back and forth suspended from above.",TABLE:"A piece of furniture with a flat top on legs.",TASTE:"The sensation of flavour; to sample food.",TEACH:"To instruct or educate someone.",TEARS:"Drops of liquid from the eyes when crying.",TEETH:"The plural of tooth; hard structures used for biting.",THICK:"Having great depth between surfaces; dense.",THING:"An object or matter; used vaguely for anything.",THINK:"To use the mind to consider or reason.",THIRD:"Coming after the second in order.",THREE:"The number 3.",THROW:"To propel something through the air.",THUMB:"The short thick digit on the hand.",TIGER:"A large wild cat with distinctive stripes.",TIGHT:"Fixed or fastened firmly; close-fitting.",TIMER:"A device for measuring time intervals.",TIRED:"In need of rest or sleep; bored with.",TITLE:"The name of a creative work; a rank or position.",TODAY:"On or during the present day.",TOTAL:"Comprising the whole amount; complete.",TOUCH:"To make contact with; the sense of feeling.",TOUGH:"Strong and resilient; difficult.",TOWER:"A tall narrow building or structure.",TOXIC:"Poisonous; harmful.",TRACK:"A path or course; to follow the trail of.",TRADE:"The buying and selling of goods.",TRAIL:"A path through the countryside; to follow.",TRAIN:"A series of railway carriages; to teach or practise.",TRAIT:"A distinguishing quality or characteristic.",TREND:"A general direction of change or development.",TRIAL:"A formal legal examination; a test.",TRICK:"A cunning act intended to deceive; a magic act.",TROOP:"A group of soldiers or people.",TRUCK:"A large road vehicle for carrying goods.",TRUNK:"The main stem of a tree; the body; a large box.",TRUST:"Firm belief in reliability or truth.",TRUTH:"The quality or state of being true.",TWICE:"Two times.",TWIST:"To form a spiral; an unexpected development.",UNDER:"Beneath; less than.",UNITE:"To come together as one.",UNITY:"The state of being united.",UNTIL:"Up to the time that.",UPPER:"Situated above another.",UPSET:"Unhappy; to make unhappy; an unexpected defeat.",URBAN:"Relating to a town or city.",USAGE:"The way in which something is used.",USUAL:"Habitually or typically occurring.",VALID:"Logically sound; legally binding.",VALUE:"The importance or worth of something.",VALVE:"A device controlling flow through a pipe.",VAPOR:"A substance diffused in the air in fine particles.",VAULT:"A large secure room; an arched ceiling; to leap over.",VERSE:"Writing arranged with a metrical rhythm; a stanza.",VIDEO:"A recording of moving visual images.",VIRAL:"Spreading rapidly via social media or internet.",VIRUS:"A microscopic infectious agent causing disease.",VISIT:"To go to see a person or place.",VITAL:"Absolutely necessary for life.",VOICE:"The sound produced when speaking or singing.",VOTER:"A person who votes in an election.",WASTE:"To use carelessly; matter that is unusable.",WATCH:"To look at carefully; a small timepiece.",WATER:"The colourless liquid essential for life.",WEAVE:"To interlace threads to make fabric or a pattern.",WEDGE:"A triangular piece used to split or fix.",WEIRD:"Suggesting the supernatural; strange.",WHEEL:"A circular rotating object.",WHITE:"The colour of snow; pure.",WHOLE:"All of something; not divided or cut.",WITCH:"A woman thought to practise magic.",WOMAN:"An adult human female.",WORLD:"The earth; all of human society.",WORRY:"To feel anxious; a source of anxiety.",WORTH:"The value of something; deserving.",WOULD:"Expressing a conditional or habitual past action.",WRITE:"To mark letters or words on a surface.",WRONG:"Not correct; unjust.",YACHT:"A medium-sized sailing or motor boat.",YIELD:"To produce or provide; to give way.",YOUNG:"Having lived for a short time; youthful.",YOUTH:"The period between childhood and adulthood."};
+function getDef(w){return DEFS[w]||null;}
+// End screen
+function showEndScreen(won){gridEl.style.display='none';const es=document.getElementById('end-screen');es.classList.add('show');const isC=state.mode==='challenge',isE=state.mode==='endless';document.getElementById('end-label').textContent=won?'You got it!':'The word was';document.getElementById('end-word').textContent=state.word;document.getElementById('end-msg').textContent=won?(isC?`Challenge solved in ${state.row} ${state.row===1?'guess':'guesses'}!`:`Solved in ${state.row} ${state.row===1?'guess':'guesses'}.${isE?' Play again below!':' Come back tomorrow.'}`):(isC?`Challenge failed. Better luck next time!`:`The answer was ${state.word}.${isE?' Try again!':' Come back tomorrow.'}`);const def=getDef(state.word),defEl=document.getElementById('end-definition');if(def){defEl.textContent=`${state.word}: ${def}`;defEl.classList.add('show');}else{defEl.classList.remove('show');}document.getElementById('btn-replay').style.display=isE?'block':'none';document.getElementById('btn-challenge-again').style.display=isC?'block':'none';}
+// Share
 const EMOJIS={correct:{normal:'🟩',cb:'🟦'},present:{normal:'🟨',cb:'🟧'},absent:{normal:'⬛',cb:'⬛'}};
-document.getElementById('btn-share').addEventListener('click',()=>{
-  const cb=document.documentElement.dataset.cb==='true';
-  const lines=state.guessResults.map(({result})=>result.map(r=>EMOJIS[r][cb?'cb':'normal']).join(''));
-  const won=state.guessResults.at(-1)?.result.every(r=>r==='correct');
-  const score=won?state.guessResults.length:'X';
-  const modeTag=state.mode==='challenge'?' ⚔':state.mode==='endless'?' ∞':'';
-  const text=`KNUCKLE${modeTag} ${score}/${MAX_GUESSES}\n\n${lines.join('\n')}`;
-  navigator.clipboard.writeText(text).then(()=>{
-    const btn=document.getElementById('btn-share');
-    const orig=btn.textContent;btn.textContent='Copied!';
-    setTimeout(()=>btn.textContent=orig,1800);
-  }).catch(()=>showToast('Copy failed',1500,true));
-});
-
-// ════════════════════════════════════════════════════════
-//  MODE MANAGEMENT
-// ════════════════════════════════════════════════════════
-function setBadge(text,cls=''){
-  const b=document.getElementById('mode-badge');
-  b.textContent=text;
-  b.className='';
-  if(text){b.classList.add('show');if(cls)b.classList.add(cls);}
-}
-function resetGame(word,mode){
-  state={word:word.toUpperCase(),mode,row:0,col:0,guess:[],over:false,guessResults:[]};
-  Object.keys(kState).forEach(k=>delete kState[k]);
-  buildGrid();buildKeyboard();
-  document.getElementById('end-screen').classList.remove('show');
-  gridEl.style.display='flex';
-  document.getElementById('btn-challenge').classList.toggle('challenge-active', mode==='challenge');
-}
-
-// Endless
-document.getElementById('btn-replay').addEventListener('click',()=>{
-  resetGame(ENDLESS_POOL[Math.floor(Math.random()*ENDLESS_POOL.length)],'endless');
-  setBadge('endless mode');
-});
-document.getElementById('btn-challenge-again').addEventListener('click',()=>openChallengeModal());
-
-// ════════════════════════════════════════════════════════
-//  STREAK BAR
-// ════════════════════════════════════════════════════════
-function updateStreakBar(){
-  document.getElementById('s-played').textContent=stats.played;
-  document.getElementById('s-streak').textContent=stats.streak;
-  document.getElementById('s-best').textContent=stats.best;
-  const pct=stats.played?Math.round(stats.wins/stats.played*100):0;
-  document.getElementById('s-pct').textContent=pct+'%';
-}
+document.getElementById('btn-share').addEventListener('click',()=>{const cb=document.documentElement.dataset.cb==='true',lines=state.guessResults.map(({result})=>result.map(r=>EMOJIS[r][cb?'cb':'normal']).join('')),won=state.guessResults.at(-1)?.result.every(r=>r==='correct'),score=won?state.guessResults.length:'X',tag=state.mode==='challenge'?' ⚔':state.mode==='endless'?' ∞':` #${getDayNumber()+1}`,hardTag=hardMode?' [HARD]':'',text=`KNUCKLE${tag}${hardTag} ${score}/${MAX_GUESSES}\n\n${lines.join('\n')}`;navigator.clipboard.writeText(text).then(()=>{const btn=document.getElementById('btn-share'),orig=btn.textContent;btn.textContent='Copied! ✓';setTimeout(()=>btn.textContent=orig,1800);}).catch(()=>showToast('Copy failed',1500,'error'));});
+// Mode management
+function showBadge(mode){['daily','hard','challenge','endless'].forEach(b=>document.getElementById('badge-'+b)?.classList.remove('show'));if(mode==='daily')document.getElementById('badge-daily').classList.add('show');if(mode==='endless')document.getElementById('badge-endless').classList.add('show');if(mode==='challenge')document.getElementById('badge-challenge').classList.add('show');if(hardMode&&mode!=='challenge')document.getElementById('badge-hard').classList.add('show');}
+function resetGame(word,mode){state={word:word.toUpperCase(),mode,row:0,col:0,guess:[],over:false,guessResults:[],hardRequired:[]};Object.keys(kState).forEach(k=>delete kState[k]);buildGrid();buildKeyboard();document.getElementById('end-screen').classList.remove('show');document.getElementById('end-definition').classList.remove('show');gridEl.style.display='flex';updateTension();showBadge(mode);document.getElementById('btn-challenge').classList.toggle('challenge-active',mode==='challenge');gridEl.querySelectorAll('.row')[0]?.classList.add('active-row');}
+showBadge('daily');
+document.getElementById('btn-replay').addEventListener('click',()=>resetGame(ALL_WORDS[Math.floor(Math.random()*ALL_WORDS.length)],'endless'));
+document.getElementById('btn-challenge-again').addEventListener('click',openChallengeModal);
+// Hard mode
+const btnHard=document.getElementById('btn-hard');
+function applyHardMode(v){hardMode=v;btnHard.classList.toggle('hard-active',v);btnHard.dataset.hard=String(v);localStorage.setItem('knuckle_hard',JSON.stringify(v));showBadge(state.mode);if(v)showToast('Hard mode on — revealed hints must be reused',2200,'warn');else showToast('Hard mode off',1500);}
+applyHardMode(hardMode);
+btnHard.addEventListener('click',()=>{if(state.row>0&&!state.over){showToast('Finish the current game first',1800,'warn');return;}applyHardMode(!hardMode);});
+// Streak
+function updateStreakBar(){document.getElementById('s-played').textContent=stats.played;document.getElementById('s-streak').textContent=stats.streak;document.getElementById('s-best').textContent=stats.best;const pct=stats.played?Math.round(stats.wins/stats.played*100):0;document.getElementById('s-pct').textContent=pct+'%';document.getElementById('streak-flame').classList.toggle('show',stats.streak>=3);}
 updateStreakBar();
-
-// ════════════════════════════════════════════════════════
-//  STATS MODAL
-// ════════════════════════════════════════════════════════
-function openStats(){
-  document.getElementById('m-played').textContent=stats.played;
-  document.getElementById('m-wins').textContent=stats.wins;
-  document.getElementById('m-streak').textContent=stats.streak;
-  document.getElementById('m-best').textContent=stats.best;
-  const chart=document.getElementById('dist-chart');chart.innerHTML='';
-  const maxVal=Math.max(1,...Object.values(stats.dist));
-  const lastWon=state.over&&state.guessResults.at(-1)?.result.every(r=>r==='correct');
-  const lastRow=lastWon?String(state.row):'';
-  for(let i=1;i<=6;i++){
-    const val=stats.dist[i]||0,pct=Math.max(8,Math.round(val/maxVal*100));
-    const row=document.createElement('div');row.className='bar-row';
-    row.innerHTML=`<div class="bar-label">${i}</div><div class="bar-track"><div class="bar-fill${String(i)===lastRow?' current':''}" style="width:0%">${val}</div></div>`;
-    chart.appendChild(row);
-    setTimeout(()=>row.querySelector('.bar-fill').style.width=pct+'%',50);
-  }
-  document.getElementById('stats-modal').classList.add('open');
-}
+// Stats modal
+function openStats(){document.getElementById('m-played').textContent=stats.played;document.getElementById('m-wins').textContent=stats.wins;document.getElementById('m-streak').textContent=stats.streak;document.getElementById('m-best').textContent=stats.best;const chart=document.getElementById('dist-chart');chart.innerHTML='';const maxVal=Math.max(1,...Object.values(stats.dist)),lastWon=state.over&&state.guessResults.at(-1)?.result.every(r=>r==='correct'),lastRow=lastWon?String(state.row):'';for(let i=1;i<=6;i++){const val=stats.dist[i]||0,pct=Math.max(8,Math.round(val/maxVal*100)),row=document.createElement('div');row.className='bar-row';row.innerHTML=`<div class="bar-label">${i}</div><div class="bar-track"><div class="bar-fill${String(i)===lastRow?' current':''}" style="width:0%">${val}</div></div>`;chart.appendChild(row);setTimeout(()=>row.querySelector('.bar-fill').style.width=pct+'%',60);}}
 function closeStats(){document.getElementById('stats-modal').classList.remove('open');}
 document.getElementById('btn-stats').addEventListener('click',openStats);
 document.getElementById('stats-close').addEventListener('click',closeStats);
 document.getElementById('stats-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStats();});
-
-// ════════════════════════════════════════════════════════
-//  CHALLENGE MODAL
-// ════════════════════════════════════════════════════════
-let chWord = [];  // letters typed in SET panel
-let generatedCode = '';
-
-function openChallengeModal(){
-  resetChSetPanel();
-  switchTab('set');
-  document.getElementById('challenge-modal').classList.add('open');
-}
+// Challenge modal
+let chWord=[],generatedCode='';
+function openChallengeModal(){resetChSetPanel();switchTab('set');document.getElementById('challenge-modal').classList.add('open');}
 function closeChallengeModal(){document.getElementById('challenge-modal').classList.remove('open');}
 document.getElementById('btn-challenge').addEventListener('click',openChallengeModal);
 document.getElementById('challenge-close').addEventListener('click',closeChallengeModal);
 document.getElementById('challenge-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeChallengeModal();});
-
-// Tabs
-function switchTab(which){
-  document.getElementById('tab-set').classList.toggle('active',which==='set');
-  document.getElementById('tab-enter').classList.toggle('active',which==='enter');
-  document.getElementById('ch-set-panel').classList.toggle('active',which==='set');
-  document.getElementById('ch-enter-panel').classList.toggle('active',which==='enter');
-  if(which==='enter'){
-    document.getElementById('ch-code-input').value='';
-    document.getElementById('ch-enter-error').textContent='';
-    document.getElementById('btn-start-challenge').disabled=true;
-    loadedChallengeWord='';
-  }
-}
+function switchTab(w){document.getElementById('tab-set').classList.toggle('active',w==='set');document.getElementById('tab-enter').classList.toggle('active',w==='enter');document.getElementById('ch-set-panel').classList.toggle('active',w==='set');document.getElementById('ch-enter-panel').classList.toggle('active',w==='enter');if(w==='enter'){document.getElementById('ch-code-input').value='';document.getElementById('ch-enter-error').textContent='';loadedChallengeWord='';}}
 document.getElementById('tab-set').addEventListener('click',()=>switchTab('set'));
 document.getElementById('tab-enter').addEventListener('click',()=>switchTab('enter'));
-
-// ── SET panel ──────────────────────────────────────────
-function buildChWordDisplay(){
-  const d=document.getElementById('ch-word-display');d.innerHTML='';
-  for(let i=0;i<WL;i++){
-    const t=document.createElement('div');
-    t.className='ch-tile'+(i===chWord.length?' active-ch':chWord[i]?' filled':'');
-    t.textContent=chWord[i]||'';
-    d.appendChild(t);
-  }
-}
-
-function buildChKeyboard(){
-  const el=document.getElementById('ch-keyboard');el.innerHTML='';
-  KB_ROWS.forEach(row=>{
-    const rowEl=document.createElement('div');rowEl.className='ch-kb-row';
-    row.forEach(k=>{
-      const btn=document.createElement('button');
-      btn.className='ch-key'+(k.length>1?' wide':'');
-      btn.textContent=k;
-      btn.addEventListener('click',()=>handleChKey(k));
-      rowEl.appendChild(btn);
-    });
-    el.appendChild(rowEl);
-  });
-}
-
-function handleChKey(k){
-  if(k==='⌫'){
-    if(chWord.length)chWord.pop();
-  } else if(k==='ENTER'){
-    validateAndGenerate();return;
-  } else if(/^[A-Z]$/.test(k)&&chWord.length<WL){
-    chWord.push(k);
-  }
-  document.getElementById('ch-error').textContent='';
-  document.getElementById('code-box').classList.remove('show');
-  document.getElementById('btn-copy-code').style.display='none';
-  document.getElementById('btn-gen-code').style.display='block';
-  buildChWordDisplay();
-}
-
-function validateAndGenerate(){
-  const word=chWord.join('');
-  if(word.length<WL){
-    document.getElementById('ch-error').textContent='Word must be 5 letters.';return;
-  }
-  if(!VALID_WORDS.has(word)){
-    document.getElementById('ch-error').textContent=`"${word}" isn't in the word list.`;
-    // shake tiles
-    document.querySelectorAll('.ch-tile').forEach(t=>{
-      t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake');
-      t.addEventListener('animationend',()=>t.classList.remove('shake'),{once:true});
-    });
-    return;
-  }
-  document.getElementById('ch-error').textContent='';
-  generatedCode=encodeWord(word);
-  document.getElementById('code-value').textContent=formatCode(generatedCode);
-  document.getElementById('code-box').classList.add('show');
-  document.getElementById('btn-gen-code').style.display='none';
-  document.getElementById('btn-copy-code').style.display='block';
-}
-
-function formatCode(code){
-  // format as XXXX-XXXX-XXXX for readability
-  return code.match(/.{1,4}/g).join('-');
-}
-function stripFormat(code){ return code.replace(/-/g,'').trim(); }
-
+function buildChWordDisplay(){const d=document.getElementById('ch-word-display');d.innerHTML='';for(let i=0;i<WL;i++){const t=document.createElement('div');t.className='ch-tile'+(i===chWord.length?' active-ch':chWord[i]?' filled':'');t.textContent=chWord[i]||'';d.appendChild(t);}}
+function buildChKeyboard(){const el=document.getElementById('ch-keyboard');el.innerHTML='';KB_ROWS.forEach(row=>{const rowEl=document.createElement('div');rowEl.className='ch-kb-row';row.forEach(k=>{const btn=document.createElement('button');btn.className='ch-key'+(k.length>1?' wide':'');btn.textContent=k;btn.addEventListener('click',()=>handleChKey(k));rowEl.appendChild(btn);});el.appendChild(rowEl);});}
+function handleChKey(k){if(k==='⌫'){if(chWord.length)chWord.pop();}else if(k==='ENTER'){validateAndGenerate();return;}else if(/^[A-Z]$/.test(k)&&chWord.length<WL){chWord.push(k);}document.getElementById('ch-error').textContent='';document.getElementById('code-box').classList.remove('show');document.getElementById('btn-copy-code').style.display='none';document.getElementById('btn-gen-code').style.display='block';buildChWordDisplay();}
+function validateAndGenerate(){const word=chWord.join('');if(word.length<WL){document.getElementById('ch-error').textContent='Word must be 5 letters.';return;}if(!VALID_WORDS.has(word)){document.getElementById('ch-error').textContent=`"${word}" isn't in the word list.`;return;}document.getElementById('ch-error').textContent='';generatedCode=encodeWord(word);document.getElementById('code-value').textContent=formatCode(generatedCode);document.getElementById('code-box').classList.add('show');document.getElementById('btn-gen-code').style.display='none';document.getElementById('btn-copy-code').style.display='block';}
 document.getElementById('btn-gen-code').addEventListener('click',validateAndGenerate);
-document.getElementById('btn-copy-code').addEventListener('click',()=>{
-  const display=document.getElementById('code-value').textContent;
-  navigator.clipboard.writeText(display).then(()=>{
-    const btn=document.getElementById('btn-copy-code');
-    btn.textContent='Copied! ✓';
-    setTimeout(()=>btn.textContent='Copy Code to Clipboard',2000);
-  });
-});
-
-function resetChSetPanel(){
-  chWord=[];generatedCode='';
-  document.getElementById('ch-error').textContent='';
-  document.getElementById('code-box').classList.remove('show');
-  document.getElementById('btn-copy-code').style.display='none';
-  document.getElementById('btn-gen-code').style.display='block';
-  buildChWordDisplay();
-  buildChKeyboard();
-}
-
-// ── ENTER panel ────────────────────────────────────────
+document.getElementById('btn-copy-code').addEventListener('click',()=>{navigator.clipboard.writeText(document.getElementById('code-value').textContent).then(()=>{const btn=document.getElementById('btn-copy-code');btn.textContent='Copied! ✓';setTimeout(()=>btn.textContent='Copy Code to Clipboard',2000);});});
+function resetChSetPanel(){chWord=[];generatedCode='';document.getElementById('ch-error').textContent='';document.getElementById('code-box').classList.remove('show');document.getElementById('btn-copy-code').style.display='none';document.getElementById('btn-gen-code').style.display='block';buildChWordDisplay();buildChKeyboard();}
 let loadedChallengeWord='';
-
-document.getElementById('ch-code-input').addEventListener('input',e=>{
-  const raw=stripFormat(e.target.value);
-  const decoded=decodeCode(raw);
-  const errEl=document.getElementById('ch-enter-error');
-  const goBtn=document.getElementById('btn-start-challenge');
-
-  if(!raw){errEl.textContent='';loadedChallengeWord='';goBtn.disabled=true;return;}
-  if(!decoded){
-    errEl.textContent='Invalid code — check and try again.';
-    loadedChallengeWord='';goBtn.disabled=true;
-  } else {
-    errEl.textContent=`✓ Valid code — ready to play!`;
-    errEl.style.color='var(--correct)';
-    loadedChallengeWord=decoded;
-    goBtn.disabled=false;
-  }
-});
-// Reset error color on each input
-document.getElementById('ch-code-input').addEventListener('focus',()=>{
-  document.getElementById('ch-enter-error').style.color='var(--accent)';
-});
-
-document.getElementById('btn-load-code').addEventListener('click',()=>{
-  document.getElementById('ch-code-input').dispatchEvent(new Event('input'));
-});
-
-document.getElementById('btn-start-challenge').addEventListener('click',()=>{
-  if(!loadedChallengeWord)return;
-  closeChallengeModal();
-  resetGame(loadedChallengeWord,'challenge');
-  setBadge('⚔ challenge','challenge-badge');
-  showToast('Challenge loaded — good luck!',2000);
-});
-document.getElementById('btn-start-challenge').disabled=true;
-
-// ════════════════════════════════════════════════════════
-//  THEME & COLOUR BLIND
-// ════════════════════════════════════════════════════════
+document.getElementById('ch-code-input').addEventListener('input',e=>{const raw=e.target.value.replace(/-/g,'').trim(),decoded=decodeCode(raw),errEl=document.getElementById('ch-enter-error'),goBtn=document.getElementById('btn-start-challenge');if(!raw){errEl.textContent='';loadedChallengeWord='';goBtn.disabled=true;return;}if(!decoded){errEl.style.color='var(--accent)';errEl.textContent='Invalid code — check and try again.';loadedChallengeWord='';goBtn.disabled=true;}else{errEl.style.color='var(--correct)';errEl.textContent='✓ Valid code — ready to play!';loadedChallengeWord=decoded;goBtn.disabled=false;}});
+document.getElementById('btn-load-code').addEventListener('click',()=>document.getElementById('ch-code-input').dispatchEvent(new Event('input')));
+document.getElementById('btn-start-challenge').addEventListener('click',()=>{if(!loadedChallengeWord)return;closeChallengeModal();resetGame(loadedChallengeWord,'challenge');showToast('Challenge loaded — good luck!',2000);});
+// Theme / CB / HC
 const btnTheme=document.getElementById('btn-theme');
 let theme=localStorage.getItem('knuckle_theme')||'dark';
-function applyTheme(t){
-  theme=t;document.documentElement.dataset.theme=t;
-  btnTheme.textContent=t==='dark'?'☀':'☽';
-  btnTheme.classList.toggle('active',t==='light');
-  localStorage.setItem('knuckle_theme',t);
-}
+function applyTheme(t){theme=t;document.documentElement.dataset.theme=t;btnTheme.textContent=t==='dark'?'☀':'☽';btnTheme.classList.toggle('active',t==='light');localStorage.setItem('knuckle_theme',t);}
 applyTheme(theme);
 btnTheme.addEventListener('click',()=>applyTheme(theme==='dark'?'light':'dark'));
-
 const btnCb=document.getElementById('btn-cb');
 let cb=localStorage.getItem('knuckle_cb')==='true';
-function applyCb(v){
-  cb=v;document.documentElement.dataset.cb=String(v);
-  btnCb.classList.toggle('active',v);
-  localStorage.setItem('knuckle_cb',String(v));
-}
+function applyCb(v){cb=v;document.documentElement.dataset.cb=String(v);btnCb.classList.toggle('active',v);localStorage.setItem('knuckle_cb',String(v));}
 applyCb(cb);
 btnCb.addEventListener('click',()=>applyCb(!cb));
-
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeStats();closeChallengeModal();} });
+const btnHc=document.getElementById('btn-hc');
+let hc=localStorage.getItem('knuckle_hc')==='true';
+function applyHc(v){hc=v;document.documentElement.dataset.hc=String(v);btnHc.classList.toggle('active',v);localStorage.setItem('knuckle_hc',String(v));}
+applyHc(hc);
+btnHc.addEventListener('click',()=>applyHc(!hc));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeStats();closeChallengeModal();}});
 </script>
 </body>
 </html>
