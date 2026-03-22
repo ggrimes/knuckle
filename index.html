@@ -6,628 +6,782 @@
 <title>KNUCKLE</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0d0d0d;--panel:#161616;--border:#2a2a2a;--text:#e8e8e8;--muted:#555;--sub:#888;--kbg:#252525;--kt:#ccc;--acc:#e63946;--cor:#4a9e6b;--pre:#c9933a;--abs:#2a2a2a;--abk:#1a1a1a;--abl:#444;--mbg:rgba(0,0,0,.8);--bar:#2a2a2a;--ch:#7b61ff;--tab:#444;}
-[data-theme="light"]{--bg:#f5f5f0;--panel:#fff;--border:#d0d0c8;--text:#1a1a1a;--muted:#aaa;--sub:#666;--kbg:#d8d8d0;--kt:#1a1a1a;--abs:#c8c8c0;--abk:#c0c0b8;--abl:#888;--mbg:rgba(200,200,195,.88);--bar:#c8c8c0;--tab:#bbb;}
-[data-cb="true"]{--cor:#0072b2;--pre:#e69f00;}
-[data-hc="true"]{--border:#666;--text:#fff;--bg:#000;--panel:#111;--kbg:#333;--kt:#fff;--abs:#333;--abk:#222;--abl:#999;--cor:#00c853;--pre:#ffd600;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:"Space Mono",monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;transition:background .3s,color .3s;}
-#cvs{position:fixed;inset:0;pointer-events:none;z-index:50;}
-header{width:100%;border-bottom:1px solid var(--border);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;background:var(--panel);position:relative;}
-.logo{font-family:"Bebas Neue",sans-serif;font-size:2.1rem;letter-spacing:.18em;color:var(--text);position:absolute;left:50%;transform:translateX(-50%);}
-.logo em{color:var(--acc);font-style:normal;}
-.hi{font-size:.5rem;letter-spacing:.2em;color:var(--acc);vertical-align:super;margin-left:3px;display:none;}
-.hi.on{display:inline;}
-.hs{display:flex;gap:6px;}
-.ib{width:34px;height:34px;border:1px solid var(--border);background:var(--kbg);color:var(--text);font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .1s;user-select:none;}
-.ib:active{transform:scale(.88);}
-.ib.on{border-color:var(--acc);color:var(--acc);}
-.ib.chon{border-color:var(--ch);color:var(--ch);}
-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px 16px 14px;width:100%;max-width:480px;}
-.ibar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;}
-#mbadge{font-size:.55rem;letter-spacing:.22em;color:var(--acc);border:1px solid var(--acc);padding:3px 9px;text-transform:uppercase;display:none;}
-#mbadge.on{display:block;}
-#mbadge.ch{color:var(--ch);border-color:var(--ch);}
-#dtbadge{font-size:.52rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;}
-#cblbl{font-size:.5rem;letter-spacing:.18em;color:var(--pre);text-transform:uppercase;display:none;}
-[data-cb="true"] #cblbl{display:block;}
-#sbar{display:flex;gap:18px;}
-.si{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.sn{font-family:"Bebas Neue",sans-serif;font-size:1.55rem;color:var(--text);line-height:1;display:flex;align-items:center;gap:3px;}
-.fl{font-size:1rem;display:none;animation:flm 1s ease infinite;}
-.fl.on{display:inline;}
-@keyframes flm{0%,100%{transform:scale(1) rotate(-4deg);}50%{transform:scale(1.2) rotate(4deg);}}
-.sl{text-transform:uppercase;font-size:.5rem;letter-spacing:.14em;color:var(--muted);}
-#grid{display:flex;flex-direction:column;gap:5px;}
-.row{display:flex;gap:5px;padding:2px;border-radius:1px;}
-.row.ar{background:rgba(255,255,255,.03);}
-[data-theme="light"] .row.ar{background:rgba(0,0,0,.03);}
-.row.t1 .tile{border-color:#6b3a20!important;}
-.row.t2 .tile{border-color:#7a2020!important;animation:tpulse 1.2s ease infinite;}
-@keyframes tpulse{0%,100%{box-shadow:none;}50%{box-shadow:0 0 12px rgba(230,57,70,.25);}}
-.row.t2{animation:tshud 3s ease infinite;}
-@keyframes tshud{0%,96%,100%{transform:translateX(0);}97%{transform:translateX(-1px);}98%{transform:translateX(1px);}99%{transform:translateX(-1px);}}
-@keyframes ti{from{transform:translateY(10px) scale(.88);}to{transform:translateY(0) scale(1);}}
-.tile{width:54px;height:54px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:"Bebas Neue",sans-serif;font-size:1.85rem;color:var(--text);background:var(--panel);position:relative;overflow:hidden;will-change:transform;transition:border-color .15s,background .15s;}
-[data-hc="true"] .tile{border-width:3px;}
-.tile.intro{animation:ti .35s cubic-bezier(.34,1.56,.64,1) forwards;}
-.tile.atile{border-color:var(--tab);}
-@keyframes lp{0%{transform:scale(.65) rotate(-5deg);opacity:0;}65%{transform:scale(1.18) rotate(1.5deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
-.tile.pop{animation:lp .2s cubic-bezier(.34,1.56,.64,1) forwards;}
-@keyframes shk{0%,100%{transform:translateX(0);}14%{transform:translateX(-8px) rotate(-1deg);}28%{transform:translateX(8px) rotate(1deg);}42%{transform:translateX(-5px);}57%{transform:translateX(5px);}71%{transform:translateX(-3px);}85%{transform:translateX(3px);}}
-.tile.shk{animation:shk .48s ease;}
-@keyframes ivf{0%,100%{border-color:var(--border);}30%{border-color:var(--acc);box-shadow:0 0 10px var(--acc);}60%{border-color:var(--acc);}}
-.tile.inv{animation:shk .48s ease,ivf .6s ease;}
-.tile.correct{background:var(--cor);border-color:var(--cor);color:#fff;}
-.tile.present{background:var(--pre);border-color:var(--pre);color:#fff;}
-.tile.absent{background:var(--abs);border-color:var(--abs);color:var(--abl);}
-@keyframes cglow{0%,100%{box-shadow:0 0 8px var(--cor);}50%{box-shadow:0 0 28px 6px var(--cor),inset 0 0 14px rgba(74,158,107,.3);}}
-.tile.correct.gl{animation:cglow .9s ease 0s 2;}
-@keyframes wb{0%,100%{transform:translateY(0) scale(1);}30%{transform:translateY(-18px) scale(1.12);}60%{transform:translateY(-7px) scale(1.04);}}
-.tile.wb{animation:wb .65s cubic-bezier(.34,1.56,.64,1) both;}
-@keyframes ld{0%{transform:translateY(0) rotate(0) scale(1);opacity:1;}30%{transform:translateY(-8px) rotate(-2deg) scale(1.05);}100%{transform:translateY(60px) rotate(4deg) scale(.9);opacity:.4;}}
-.tile.ld{animation:ld .6s cubic-bezier(.4,0,.6,1) both;}
-.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(255,255,255,.09) 50%,transparent 65%);transform:translateY(-120%);pointer-events:none;}
-.tile.scan::after{animation:scl .45s ease .1s forwards;}
-@keyframes scl{from{transform:translateY(-120%);}to{transform:translateY(120%);}}
-#toast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-14px);background:var(--text);color:var(--bg);padding:9px 20px;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;opacity:0;transition:opacity .2s,transform .28s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:200;white-space:nowrap;max-width:92vw;}
-#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
-#toast.err{background:var(--acc);color:#fff;}
-#toast.herr{background:#7b2fbf;color:#fff;}
-#kb{display:flex;flex-direction:column;gap:5px;align-items:center;width:100%;}
-.kr{display:flex;gap:4px;}
-.key{height:48px;min-width:32px;padding:0 4px;background:var(--kbg);color:var(--kt);border:1px solid var(--border);font-family:"Space Mono",monospace;font-size:.66rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .28s,color .28s,border-color .28s,transform .1s;letter-spacing:.05em;text-transform:uppercase;user-select:none;}
-.key:active{transform:scale(.9);}
-.key.w{min-width:52px;font-size:.56rem;}
-.key.correct{background:var(--cor);border-color:var(--cor);color:#fff;}
-.key.present{background:var(--pre);border-color:var(--pre);color:#fff;}
-.key.absent{background:var(--abk);border-color:var(--abk);color:var(--abl);}
-@keyframes kp{0%{transform:scale(1);}45%{transform:scale(1.22);}100%{transform:scale(1);}}
-.key.jr{animation:kp .32s cubic-bezier(.34,1.56,.64,1);}
-#es{display:none;flex-direction:column;align-items:center;gap:13px;text-align:center;}
-#es.on{display:flex;animation:ein .7s cubic-bezier(.34,1.56,.64,1) both;}
-@keyframes ein{from{opacity:0;transform:translateY(24px) scale(.92);}to{opacity:1;transform:translateY(0) scale(1);}}
-.el{font-size:.6rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;}
-.ew{font-family:"Bebas Neue",sans-serif;font-size:3.6rem;letter-spacing:.2em;color:var(--acc);line-height:1;animation:wg 2s ease infinite;}
-@keyframes wg{0%,100%{text-shadow:0 0 20px rgba(230,57,70,.5);}50%{text-shadow:0 0 60px rgba(230,57,70,.9),0 0 100px rgba(230,57,70,.4);}}
-.edef{font-size:.65rem;color:var(--sub);max-width:300px;line-height:1.7;font-style:italic;border-left:2px solid var(--border);padding-left:10px;text-align:left;}
-.emsg{font-size:.7rem;color:var(--sub);letter-spacing:.08em;max-width:280px;line-height:1.7;}
-.ea{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;justify-content:center;}
-.eb{padding:9px 16px;font-family:"Space Mono",monospace;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:1px solid;transition:transform .1s;}
-.eb:active{transform:scale(.94);}
-.eb.sh{background:var(--cor);border-color:var(--cor);color:#fff;}
-.eb.rp{background:transparent;border-color:var(--acc);color:var(--acc);}
-.eb.ca{background:transparent;border-color:var(--ch);color:var(--ch);}
-.mo{position:fixed;inset:0;background:var(--mbg);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(5px);}
-.mo.on{opacity:1;pointer-events:all;}
-.md{background:var(--panel);border:1px solid var(--border);padding:24px;width:min(360px,94vw);transform:translateY(20px) scale(.96);transition:transform .32s cubic-bezier(.34,1.56,.64,1);position:relative;max-height:90vh;overflow-y:auto;}
-.mo.on .md{transform:translateY(0) scale(1);}
-.mt{font-family:"Bebas Neue",sans-serif;font-size:1.45rem;letter-spacing:.18em;color:var(--text);margin-bottom:16px;text-align:center;}
-.mc{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;}
-.mc:hover{color:var(--text);}
-.str{display:flex;justify-content:center;gap:16px;margin-bottom:16px;}
-.sb{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.sbn{font-family:"Bebas Neue",sans-serif;font-size:1.9rem;color:var(--text);line-height:1;}
-.sbl{font-size:.5rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;text-align:center;max-width:52px;}
-.ct{font-size:.54rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;text-align:center;}
-.br{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-.bl{color:var(--sub);width:10px;text-align:right;font-size:.62rem;}
-.bt{flex:1;height:17px;background:var(--bar);overflow:hidden;}
-.bf{height:100%;background:var(--cor);display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-family:"Space Mono",monospace;font-size:.58rem;color:#fff;font-weight:700;min-width:18px;transition:width .6s cubic-bezier(.34,1,.64,1);}
-.bf.cur{background:var(--acc);}
-.setr{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
-.setr:last-child{border-bottom:none;}
-.setl{font-size:.65rem;letter-spacing:.1em;color:var(--text);}
-.setd{font-size:.52rem;color:var(--muted);margin-top:2px;}
-.tog{width:40px;height:22px;background:var(--bar);border:1px solid var(--border);border-radius:11px;cursor:pointer;position:relative;transition:background .25s;flex-shrink:0;}
-.tog::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .25s,background .25s;}
-.tog.on{background:var(--acc);border-color:var(--acc);}
-.tog.on::after{transform:translateX(18px);background:#fff;}
-.chmd .md{border-color:var(--ch);}
-.chmd .mt{color:var(--ch);}
-.cht{display:flex;margin-bottom:18px;border:1px solid var(--border);}
-.ctab{flex:1;padding:9px;font-family:"Space Mono",monospace;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:transparent;color:var(--muted);border:none;transition:background .2s,color .2s;}
-.ctab.on{background:var(--ch);color:#fff;}
-#chsp,#chep{display:none;}
-#chsp.on,#chep.on{display:block;}
-.chl{font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.chwd{display:flex;gap:5px;justify-content:center;margin-bottom:14px;}
-.cht2{width:46px;height:46px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:"Bebas Neue",sans-serif;font-size:1.65rem;color:var(--text);background:var(--panel);}
-.cht2.act{border-color:var(--ch);}
-.cht2.fil{border-color:var(--sub);}
-.chkb{display:flex;flex-direction:column;gap:3px;align-items:center;margin-bottom:12px;}
-.chkbr{display:flex;gap:3px;}
-.ck{height:38px;min-width:26px;padding:0 3px;background:var(--kbg);color:var(--kt);border:1px solid var(--border);font-family:"Space Mono",monospace;font-size:.58rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s;letter-spacing:.04em;text-transform:uppercase;user-select:none;}
-.ck:active{transform:scale(.88);}
-.ck.w{min-width:42px;font-size:.48rem;}
-.cherr{font-size:.6rem;color:var(--acc);letter-spacing:.1em;min-height:18px;margin-bottom:8px;text-align:center;}
-.cbox{background:var(--bg);border:1px solid var(--ch);padding:12px;text-align:center;margin-bottom:12px;display:none;}
-.cbox.on{display:block;animation:ein .4s ease both;}
-.cboxl{font-size:.5rem;letter-spacing:.24em;color:var(--ch);text-transform:uppercase;margin-bottom:5px;}
-.cboxv{font-family:"Bebas Neue",sans-serif;font-size:2rem;letter-spacing:.28em;color:var(--text);word-break:break-all;}
-.cboxh{font-size:.5rem;color:var(--muted);letter-spacing:.1em;margin-top:5px;}
-.ciw{display:flex;gap:7px;margin-bottom:10px;}
-.ci{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:"Space Mono",monospace;font-size:.82rem;padding:9px 10px;letter-spacing:.18em;text-transform:uppercase;outline:none;transition:border-color .2s;}
-.ci:focus{border-color:var(--ch);}
-.ci::placeholder{font-size:.62rem;letter-spacing:.1em;color:var(--muted);text-transform:none;}
-.cgb{padding:9px 14px;background:var(--ch);border:1px solid var(--ch);color:#fff;font-family:"Space Mono",monospace;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
-.cgb:active{transform:scale(.94);}
-.fb{width:100%;padding:9px;background:var(--ch);border:1px solid var(--ch);color:#fff;font-family:"Space Mono",monospace;font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;margin-top:2px;}
-.fb:active{transform:scale(.97);}
-.fb:disabled{opacity:.4;cursor:not-allowed;}
-.fb.cp{background:transparent;border-color:var(--ch);color:var(--ch);margin-top:7px;}
+:root {
+  --bg:#0d0d0d; --panel:#161616; --border:#2a2a2a;
+  --text:#e8e8e8; --muted:#555; --sub:#888;
+  --key-bg:#252525; --key-text:#ccc;
+  --accent:#e63946;
+  --correct:#4a9e6b; --present:#c9933a; --absent:#2a2a2a;
+  --absent-key:#1a1a1a; --absent-letter:#444;
+  --modal-bg:rgba(0,0,0,0.82); --bar:#2a2a2a;
+  --challenge:#7b61ff;
+  --row-active-glow:rgba(255,255,255,0.03);
+  --tile-active-border:#555;
+}
+[data-theme="light"] {
+  --bg:#f5f5f0; --panel:#ffffff; --border:#d0d0c8;
+  --text:#1a1a1a; --muted:#aaa; --sub:#666;
+  --key-bg:#d8d8d0; --key-text:#1a1a1a;
+  --absent:#c8c8c0; --absent-key:#c0c0b8; --absent-letter:#888;
+  --modal-bg:rgba(200,200,195,0.88); --bar:#c8c8c0;
+  --row-active-glow:rgba(0,0,0,0.02);
+  --tile-active-border:#aaa;
+}
+[data-cb="true"]  { --correct:#0072b2; --present:#e69f00; }
+[data-hc="true"]  {
+  --border:#777; --tile-active-border:#fff;
+  --text:#ffffff; --bg:#000; --panel:#111;
+  --key-bg:#333; --key-text:#fff;
+  --absent:#333; --absent-key:#222; --absent-letter:#888;
+  --correct:#00c853; --present:#ffd600;
+}
+[data-hc="true"][data-theme="light"] {
+  --bg:#fff; --panel:#f0f0f0; --text:#000;
+  --border:#000; --tile-active-border:#000;
+  --key-bg:#ddd; --key-text:#000;
+  --absent:#ccc; --absent-key:#bbb; --absent-letter:#555;
+  --correct:#006600; --present:#b35900;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'Space Mono',monospace;
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; overflow-x:hidden;
+  transition:background .3s,color .3s;
+}
+#fx-canvas { position:fixed;inset:0;pointer-events:none;z-index:50; }
+
+/* ── Header ── */
+header {
+  width:100%; border-bottom:1px solid var(--border);
+  padding:12px 14px; display:flex; align-items:center;
+  justify-content:space-between; background:var(--panel);
+  position:relative; transition:background .3s,border-color .3s;
+  min-height:58px;
+}
+.logo {
+  font-family:'Bebas Neue',sans-serif; font-size:2.1rem;
+  letter-spacing:.18em; color:var(--text);
+  position:absolute; left:50%; transform:translateX(-50%);
+  white-space:nowrap;
+}
+.logo span { color:var(--accent); }
+.hard-pip {
+  font-size:.48rem; letter-spacing:.2em; color:var(--accent);
+  vertical-align:super; margin-left:3px; display:none;
+}
+.hard-pip.show { display:inline; }
+.hgroup { display:flex; gap:6px; }
+.ibtn {
+  width:34px; height:34px; border:1px solid var(--border);
+  background:var(--key-bg); color:var(--text);
+  font-size:.95rem; cursor:pointer; display:flex;
+  align-items:center; justify-content:center;
+  transition:background .2s,border-color .2s,transform .1s;
+  user-select:none;
+}
+.ibtn:active { transform:scale(.88); }
+.ibtn.on  { border-color:var(--accent); color:var(--accent); }
+.ibtn.ch-on { border-color:var(--challenge); color:var(--challenge); }
+
+/* ── Main ── */
+main {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:20px; padding:24px 16px 14px;
+  width:100%; max-width:480px;
+}
+.infobar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:center; min-height:18px; }
+#modebadge {
+  font-size:.55rem; letter-spacing:.2em; color:var(--accent);
+  border:1px solid var(--accent); padding:2px 9px;
+  text-transform:uppercase; display:none;
+}
+#modebadge.show { display:block; }
+#modebadge.chbadge { color:var(--challenge); border-color:var(--challenge); }
+#datebadge { font-size:.52rem; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; }
+#cblabel { font-size:.5rem; letter-spacing:.15em; color:var(--present); text-transform:uppercase; display:none; }
+[data-cb="true"] #cblabel { display:block; }
+
+/* ── Streak bar ── */
+#streakbar { display:flex; gap:18px; }
+.si { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.sn {
+  font-family:'Bebas Neue',sans-serif; font-size:1.5rem;
+  color:var(--text); line-height:1;
+  display:flex; align-items:center; gap:2px;
+}
+.flame { font-size:.9rem; display:none; animation:flamePulse 1s ease infinite; }
+.flame.show { display:inline; }
+@keyframes flamePulse {
+  0%,100%{ transform:scale(1) rotate(-4deg); }
+  50%    { transform:scale(1.2) rotate(4deg); }
+}
+.sl { text-transform:uppercase; font-size:.5rem; letter-spacing:.12em; color:var(--muted); }
+
+/* ── Grid ── */
+#grid { display:flex; flex-direction:column; gap:5px; }
+.row { display:flex; gap:5px; padding:2px; }
+.row.activerow { background:var(--row-active-glow); }
+.row.tension1 .tile { border-color:#6b3a20 !important; }
+.row.tension2 .tile { border-color:#7a2020 !important; animation:tpulse 1.2s ease infinite; }
+@keyframes tpulse {
+  0%,100%{ box-shadow:none; }
+  50%    { box-shadow:0 0 12px rgba(230,57,70,.25); }
+}
+.row.tension2 { animation:tshudder 3s ease infinite; }
+@keyframes tshudder {
+  0%,96%,100%{ transform:translateX(0); }
+  97%{ transform:translateX(-1px); }
+  98%{ transform:translateX(1px); }
+  99%{ transform:translateX(-1px); }
+}
+@keyframes tileIntro {
+  from { transform:translateY(12px) scale(.85); opacity:0; }
+  to   { transform:translateY(0) scale(1); opacity:1; }
+}
+.tile.intro { animation:tileIntro .35s cubic-bezier(.34,1.56,.64,1) both; }
+.tile {
+  width:54px; height:54px; border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif; font-size:1.85rem;
+  color:var(--text); background:var(--panel);
+  position:relative; overflow:hidden; will-change:transform;
+  transition:border-color .15s, background .15s;
+}
+[data-hc="true"] .tile { border-width:3px; }
+.tile.activetile { border-color:var(--tile-active-border); }
+@keyframes letterPop {
+  0%  { transform:scale(.65) rotate(-5deg); opacity:0; }
+  65% { transform:scale(1.18) rotate(1.5deg); }
+  100%{ transform:scale(1) rotate(0); opacity:1; }
+}
+.tile.pop { animation:letterPop .2s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes shake {
+  0%,100%{ transform:translateX(0); }
+  14%{ transform:translateX(-8px) rotate(-1deg); }
+  28%{ transform:translateX(8px) rotate(1deg); }
+  42%{ transform:translateX(-5px); }
+  57%{ transform:translateX(5px); }
+  71%{ transform:translateX(-3px); }
+  85%{ transform:translateX(3px); }
+}
+.tile.shake { animation:shake .48s ease; }
+@keyframes invalidFlash {
+  0%,100%{ border-color:var(--border); }
+  30%{ border-color:var(--accent); box-shadow:0 0 10px var(--accent); }
+  60%{ border-color:var(--accent); }
+}
+.tile.invalid { animation:shake .48s ease, invalidFlash .6s ease; }
+.tile.correct { background:var(--correct); border-color:var(--correct); color:#fff; }
+.tile.present { background:var(--present); border-color:var(--present); color:#fff; }
+.tile.absent  { background:var(--absent); border-color:var(--absent); color:var(--absent-letter); }
+@keyframes correctPulse {
+  0%,100%{ box-shadow:0 0 8px var(--correct); }
+  50%{ box-shadow:0 0 28px 6px var(--correct), inset 0 0 14px rgba(74,158,107,.3); }
+}
+.tile.correct.glowing { animation:correctPulse .9s ease 0s 2; }
+@keyframes winBounce {
+  0%,100%{ transform:translateY(0) scale(1); }
+  30%{ transform:translateY(-18px) scale(1.12); }
+  60%{ transform:translateY(-7px) scale(1.04); }
+}
+.tile.winbounce { animation:winBounce .65s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes lossDrop {
+  0%  { transform:translateY(0) rotate(0) scale(1); opacity:1; }
+  30% { transform:translateY(-8px) rotate(-2deg) scale(1.05); }
+  100%{ transform:translateY(60px) rotate(4deg) scale(.9); opacity:.4; }
+}
+.tile.lossdrop { animation:lossDrop .6s cubic-bezier(.4,0,.6,1) both; }
+.tile::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(transparent 35%, rgba(255,255,255,.09) 50%, transparent 65%);
+  transform:translateY(-120%); pointer-events:none;
+}
+.tile.scan::after { animation:scanline .45s ease .1s forwards; }
+@keyframes scanline { from{transform:translateY(-120%);}to{transform:translateY(120%);} }
+
+/* ── Toast ── */
+#toast {
+  position:fixed; top:70px; left:50%;
+  transform:translateX(-50%) translateY(-14px);
+  background:var(--text); color:var(--bg);
+  padding:9px 20px; font-size:.7rem; letter-spacing:.14em;
+  text-transform:uppercase; font-weight:700;
+  opacity:0; transition:opacity .2s, transform .28s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none; z-index:200; white-space:nowrap;
+  max-width:92vw; overflow:hidden; text-overflow:ellipsis;
+}
+#toast.show   { opacity:1; transform:translateX(-50%) translateY(0); }
+#toast.iserr  { background:var(--accent); color:#fff; }
+#toast.ishard { background:#7b2fbf; color:#fff; }
+
+/* ── Keyboard ── */
+#keyboard { display:flex; flex-direction:column; gap:5px; align-items:center; width:100%; }
+.kbrow { display:flex; gap:4px; }
+.key {
+  height:48px; min-width:32px; padding:0 4px;
+  background:var(--key-bg); color:var(--key-text); border:1px solid var(--border);
+  font-family:'Space Mono',monospace; font-size:.66rem; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .28s, color .28s, border-color .28s, box-shadow .28s, transform .1s;
+  letter-spacing:.05em; text-transform:uppercase; user-select:none;
+}
+[data-hc="true"] .key { border-width:2px; }
+.key:active { transform:scale(.9); }
+.key.wide { min-width:52px; font-size:.56rem; }
+.key.correct { background:var(--correct); border-color:var(--correct); color:#fff; }
+.key.present { background:var(--present); border-color:var(--present); color:#fff; }
+.key.absent  { background:var(--absent-key); border-color:var(--absent-key); color:var(--absent-letter); }
+@keyframes keyPop { 0%{transform:scale(1);}45%{transform:scale(1.22);}100%{transform:scale(1);} }
+.key.keylit { animation:keyPop .32s cubic-bezier(.34,1.56,.64,1); }
+
+/* ── End screen ── */
+#endscreen { display:none; flex-direction:column; align-items:center; gap:13px; text-align:center; }
+#endscreen.show { display:flex; animation:endIn .7s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes endIn { from{opacity:0;transform:translateY(24px) scale(.92);}to{opacity:1;transform:translateY(0) scale(1);} }
+.endlabel { font-size:.6rem; letter-spacing:.3em; color:var(--muted); text-transform:uppercase; }
+.endword  { font-family:'Bebas Neue',sans-serif; font-size:3.6rem; letter-spacing:.2em; color:var(--accent); line-height:1; animation:wordGlow 2s ease infinite; }
+@keyframes wordGlow {
+  0%,100%{ text-shadow:0 0 20px rgba(230,57,70,.5); }
+  50%    { text-shadow:0 0 60px rgba(230,57,70,.9), 0 0 100px rgba(230,57,70,.4); }
+}
+.enddef { font-size:.65rem; color:var(--sub); max-width:300px; line-height:1.7; font-style:italic; border-left:2px solid var(--border); padding-left:10px; text-align:left; }
+.endmsg { font-size:.7rem; color:var(--sub); letter-spacing:.08em; max-width:280px; line-height:1.7; }
+.endbtns { display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; justify-content:center; }
+.ebtn { padding:9px 16px; font-family:'Space Mono',monospace; font-size:.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; border:1px solid; transition:transform .1s, box-shadow .2s; }
+.ebtn:active { transform:scale(.94); }
+.ebtn-share  { background:var(--correct); border-color:var(--correct); color:#fff; }
+.ebtn-replay { background:transparent; border-color:var(--accent); color:var(--accent); }
+.ebtn-ch     { background:transparent; border-color:var(--challenge); color:var(--challenge); }
+
+/* ── Modals ── */
+.overlay {
+  position:fixed; inset:0; background:var(--modal-bg);
+  z-index:300; display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .25s;
+  backdrop-filter:blur(5px);
+}
+.overlay.open { opacity:1; pointer-events:all; }
+.modal {
+  background:var(--panel); border:1px solid var(--border);
+  padding:24px 24px 20px; width:min(360px,94vw);
+  transform:translateY(20px) scale(.96);
+  transition:transform .32s cubic-bezier(.34,1.56,.64,1);
+  position:relative; max-height:90vh; overflow-y:auto;
+}
+.overlay.open .modal { transform:translateY(0) scale(1); }
+.modal-title { font-family:'Bebas Neue',sans-serif; font-size:1.45rem; letter-spacing:.18em; color:var(--text); margin-bottom:16px; text-align:center; }
+.modal-x { position:absolute; top:12px; right:14px; background:none; border:none; color:var(--muted); font-size:1.1rem; cursor:pointer; transition:color .15s; }
+.modal-x:hover { color:var(--text); }
+
+/* stats */
+.statrow { display:flex; justify-content:center; gap:16px; margin-bottom:16px; }
+.statbox { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.statn { font-family:'Bebas Neue',sans-serif; font-size:1.9rem; color:var(--text); line-height:1; }
+.statl { font-size:.5rem; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; text-align:center; max-width:52px; }
+.charttitle { font-size:.54rem; letter-spacing:.2em; color:var(--muted); text-transform:uppercase; margin-bottom:8px; text-align:center; }
+.barrow { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.barlabel { color:var(--sub); width:10px; text-align:right; font-size:.62rem; }
+.bartrack { flex:1; height:17px; background:var(--bar); position:relative; overflow:hidden; }
+.barfill { height:100%; background:var(--correct); display:flex; align-items:center; justify-content:flex-end; padding-right:5px; font-family:'Space Mono',monospace; font-size:.58rem; color:#fff; font-weight:700; min-width:18px; transition:width .6s cubic-bezier(.34,1,.64,1); }
+.barfill.cur { background:var(--accent); }
+
+/* settings */
+.setrow { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); }
+.setrow:last-child { border-bottom:none; }
+.setlabel { font-size:.65rem; letter-spacing:.1em; color:var(--text); }
+.setdesc  { font-size:.52rem; color:var(--muted); margin-top:2px; }
+.tog {
+  width:40px; height:22px; background:var(--bar); border:1px solid var(--border);
+  border-radius:11px; cursor:pointer; position:relative; transition:background .25s; flex-shrink:0;
+}
+.tog::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:var(--muted); transition:transform .25s, background .25s; }
+.tog.on { background:var(--accent); border-color:var(--accent); }
+.tog.on::after { transform:translateX(18px); background:#fff; }
+
+/* challenge modal */
+.chovlay .modal { border-color:var(--challenge); }
+.chovlay .modal-title { color:var(--challenge); }
+.chtabs { display:flex; margin-bottom:18px; border:1px solid var(--border); }
+.chtab { flex:1; padding:9px; font-family:'Space Mono',monospace; font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; background:transparent; color:var(--muted); border:none; transition:background .2s, color .2s; }
+.chtab.on { background:var(--challenge); color:#fff; }
+.chpanel { display:none; }
+.chpanel.on { display:block; }
+.chlabel { font-size:.56rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.chdisp { display:flex; gap:5px; justify-content:center; margin-bottom:14px; }
+.chtile { width:46px; height:46px; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:1.65rem; color:var(--text); background:var(--panel); transition:border-color .15s; }
+.chtile.cur { border-color:var(--challenge); box-shadow:0 0 8px rgba(123,97,255,.35); }
+.chtile.filled { border-color:var(--sub); }
+.chkb { display:flex; flex-direction:column; gap:3px; align-items:center; margin-bottom:12px; }
+.chkbrow { display:flex; gap:3px; }
+.chkey { height:38px; min-width:26px; padding:0 3px; background:var(--key-bg); color:var(--key-text); border:1px solid var(--border); font-family:'Space Mono',monospace; font-size:.58rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .1s; letter-spacing:.04em; text-transform:uppercase; user-select:none; }
+.chkey:active { transform:scale(.88); }
+.chkey.wide { min-width:42px; font-size:.48rem; }
+.cherr { font-size:.6rem; color:var(--accent); letter-spacing:.1em; min-height:18px; margin-bottom:8px; text-align:center; }
+.codebox { background:var(--bg); border:1px solid var(--challenge); padding:12px; text-align:center; margin-bottom:12px; display:none; }
+.codebox.show { display:block; animation:endIn .4s ease both; }
+.codelabel { font-size:.5rem; letter-spacing:.24em; color:var(--challenge); text-transform:uppercase; margin-bottom:5px; }
+.codevalue { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:.28em; color:var(--text); word-break:break-all; }
+.codehint { font-size:.5rem; color:var(--muted); letter-spacing:.1em; margin-top:5px; }
+.chinwrap { display:flex; gap:7px; margin-bottom:10px; }
+.chinput { flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); font-family:'Space Mono',monospace; font-size:.82rem; padding:9px 10px; letter-spacing:.18em; text-transform:uppercase; outline:none; transition:border-color .2s; }
+.chinput:focus { border-color:var(--challenge); }
+.chinput::placeholder { font-size:.62rem; letter-spacing:.1em; color:var(--muted); }
+.chgobtn { padding:9px 14px; background:var(--challenge); border:1px solid var(--challenge); color:#fff; font-family:'Space Mono',monospace; font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; transition:transform .1s; }
+.chgobtn:active { transform:scale(.94); }
+.fullbtn { width:100%; padding:9px; background:var(--challenge); border:1px solid var(--challenge); color:#fff; font-family:'Space Mono',monospace; font-size:.66rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; transition:transform .1s; margin-top:2px; }
+.fullbtn:active { transform:scale(.97); }
+.fullbtn:disabled { opacity:.4; cursor:not-allowed; }
+.fullbtn.copybtn { background:transparent; border-color:var(--challenge); color:var(--challenge); margin-top:7px; }
 </style>
 </head>
 <body>
-<canvas id="cvs"></canvas>
+<canvas id="fx-canvas"></canvas>
 <header>
-  <div class="hs">
-    <button class="ib" id="btn-cb"    title="Colour blind">◑</button>
-    <button class="ib" id="btn-hc"    title="High contrast">◈</button>
-    <button class="ib" id="btn-theme" title="Toggle theme">☀</button>
+  <div class="hgroup">
+    <button class="ibtn" id="btn-cb"    title="Colour Blind">◑</button>
+    <button class="ibtn" id="btn-hc"    title="High Contrast">◈</button>
+    <button class="ibtn" id="btn-theme" title="Theme">☀</button>
   </div>
-  <div class="logo">K<em>N</em>UCKLE<span class="hi" id="hard-ind">★</span></div>
-  <div class="hs">
-    <button class="ib" id="btn-ch"   title="Challenge a friend">⚔</button>
-    <button class="ib" id="btn-set"  title="Settings">⚙</button>
-    <button class="ib" id="btn-stat" title="Statistics">▦</button>
+  <div class="logo">K<span>N</span>UCKLE<span class="hard-pip" id="hardpip">★</span></div>
+  <div class="hgroup">
+    <button class="ibtn" id="btn-challenge" title="Challenge">⚔</button>
+    <button class="ibtn" id="btn-settings"  title="Settings">⚙</button>
+    <button class="ibtn" id="btn-stats"     title="Stats">▦</button>
   </div>
 </header>
+
 <div id="toast" role="alert" aria-live="assertive"></div>
+
 <main>
-  <div class="ibar">
-    <div id="mbadge"></div>
-    <div id="dtbadge"></div>
-    <div id="cblbl">colour blind</div>
+  <div class="infobar">
+    <div id="modebadge"></div>
+    <div id="datebadge"></div>
+    <div id="cblabel">colour blind</div>
   </div>
-  <div id="sbar">
-    <div class="si"><div class="sn" id="sp">0</div><div class="sl">Played</div></div>
-    <div class="si"><div class="sn" id="ss">0<span class="fl" id="flm">&#x1F525;</span></div><div class="sl">Streak</div></div>
-    <div class="si"><div class="sn" id="sb2">0</div><div class="sl">Best</div></div>
-    <div class="si"><div class="sn" id="spct">0%</div><div class="sl">Win %</div></div>
+  <div id="streakbar">
+    <div class="si"><div class="sn" id="s-played">0</div><div class="sl">Played</div></div>
+    <div class="si"><div class="sn" id="s-streak">0<span class="flame" id="flame">🔥</span></div><div class="sl">Streak</div></div>
+    <div class="si"><div class="sn" id="s-best">0</div><div class="sl">Best</div></div>
+    <div class="si"><div class="sn" id="s-pct">0%</div><div class="sl">Win %</div></div>
   </div>
-  <div id="grid">
-      <div class="row"><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
-      <div class="row"><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
-      <div class="row"><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
-      <div class="row"><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
-      <div class="row"><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
-      <div class="row"><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
-    </div>
-  <div id="es">
-    <div class="el" id="elbl">The word was</div>
-    <div class="ew"  id="eword"></div>
-    <div class="edef" id="edef" style="display:none"></div>
-    <div class="emsg" id="emsg"></div>
-    <div class="ea">
-      <button class="eb sh" id="btn-share">Share &#x1F7E9;</button>
-      <button class="eb rp" id="btn-replay" style="display:none">Play Again</button>
-      <button class="eb ca" id="btn-chagain" style="display:none">New Challenge &#x2694;</button>
+  <div id="grid"></div>
+  <div id="endscreen">
+    <div class="endlabel" id="endlabel">The word was</div>
+    <div class="endword"  id="endword"></div>
+    <div class="enddef"   id="enddef" style="display:none"></div>
+    <div class="endmsg"   id="endmsg"></div>
+    <div class="endbtns">
+      <button class="ebtn ebtn-share"  id="btn-share">Share 🟩</button>
+      <button class="ebtn ebtn-replay" id="btn-replay" style="display:none">Play Again</button>
+      <button class="ebtn ebtn-ch"     id="btn-ch-again" style="display:none">Set Challenge ⚔</button>
     </div>
   </div>
-  <div id="kb"></div>
+  <div id="keyboard"></div>
 </main>
 
-<!-- Stats Modal -->
-<div class="mo" id="mo-stat">
-  <div class="md">
-    <button class="mc" id="stat-close">&#x2715;</button>
-    <div class="mt">Statistics</div>
-    <div class="str">
-      <div class="sb"><div class="sbn" id="m-p">0</div><div class="sbl">Played</div></div>
-      <div class="sb"><div class="sbn" id="m-w">0</div><div class="sbl">Wins</div></div>
-      <div class="sb"><div class="sbn" id="m-s">0</div><div class="sbl">Streak</div></div>
-      <div class="sb"><div class="sbn" id="m-b">0</div><div class="sbl">Best</div></div>
+<!-- Stats -->
+<div class="overlay" id="ov-stats">
+  <div class="modal">
+    <button class="modal-x" id="x-stats">✕</button>
+    <div class="modal-title">Statistics</div>
+    <div class="statrow">
+      <div class="statbox"><div class="statn" id="m-played">0</div><div class="statl">Played</div></div>
+      <div class="statbox"><div class="statn" id="m-wins">0</div><div class="statl">Wins</div></div>
+      <div class="statbox"><div class="statn" id="m-streak">0</div><div class="statl">Streak</div></div>
+      <div class="statbox"><div class="statn" id="m-best">0</div><div class="statl">Best</div></div>
     </div>
-    <div class="ct">Guess Distribution</div>
-    <div id="dchart"></div>
+    <div class="charttitle">Guess Distribution</div>
+    <div id="distchart"></div>
   </div>
 </div>
 
-<!-- Settings Modal -->
-<div class="mo" id="mo-set">
-  <div class="md">
-    <button class="mc" id="set-close">&#x2715;</button>
-    <div class="mt">Settings</div>
-    <div class="setr">
-      <div><div class="setl">Hard Mode</div><div class="setd">Must use revealed letters in later guesses</div></div>
+<!-- Settings -->
+<div class="overlay" id="ov-settings">
+  <div class="modal">
+    <button class="modal-x" id="x-settings">✕</button>
+    <div class="modal-title">Settings</div>
+    <div class="setrow">
+      <div><div class="setlabel">Hard Mode</div><div class="setdesc">Must use revealed letters in next guesses</div></div>
       <div class="tog" id="tog-hard"></div>
     </div>
-    <div class="setr">
-      <div><div class="setl">Free Mode</div><div class="setd">Accept any letters as a guess — no word list check</div></div>
-      <div class="tog" id="tog-free"></div>
-    </div>
-    <div class="setr">
-      <div><div class="setl">Sound Effects</div><div class="setd">Typing clicks, chimes and buzzes</div></div>
+    <div class="setrow">
+      <div><div class="setlabel">Sound Effects</div><div class="setdesc">Typing clicks, chimes, error buzz</div></div>
       <div class="tog" id="tog-sound"></div>
     </div>
-    <div class="setr">
-      <div><div class="setl">Colour Blind Mode</div><div class="setd">Blue and orange instead of green and yellow</div></div>
+    <div class="setrow">
+      <div><div class="setlabel">Colour Blind</div><div class="setdesc">Blue / orange instead of green / yellow</div></div>
       <div class="tog" id="tog-cb"></div>
     </div>
-    <div class="setr">
-      <div><div class="setl">High Contrast</div><div class="setd">Maximum contrast colours and borders</div></div>
+    <div class="setrow">
+      <div><div class="setlabel">High Contrast</div><div class="setdesc">Maximum contrast borders and colours</div></div>
       <div class="tog" id="tog-hc"></div>
     </div>
-    <div class="setr">
-      <div><div class="setl">Dark Theme</div><div class="setd">Toggle dark / light appearance</div></div>
+    <div class="setrow">
+      <div><div class="setlabel">Dark Theme</div><div class="setdesc">Toggle dark / light appearance</div></div>
       <div class="tog" id="tog-theme"></div>
     </div>
   </div>
 </div>
 
-<!-- Challenge Modal -->
-<div class="mo chmd" id="mo-ch">
-  <div class="md">
-    <button class="mc" id="ch-close">&#x2715;</button>
-    <div class="mt">&#x2694; Challenge</div>
-    <div class="cht">
-      <button class="ctab on" id="tab-set">Set a Word</button>
-      <button class="ctab"    id="tab-ent">Enter a Code</button>
+<!-- Challenge -->
+<div class="overlay chovlay" id="ov-challenge">
+  <div class="modal">
+    <button class="modal-x" id="x-challenge">✕</button>
+    <div class="modal-title">⚔ Challenge</div>
+    <div class="chtabs">
+      <button class="chtab on" id="tab-set">Set a Word</button>
+      <button class="chtab"    id="tab-enter">Enter a Code</button>
     </div>
-    <div id="chsp" class="on">
-      <div class="chl">Type any 5-letter word (real or made up)</div>
-      <div class="chwd" id="ch-wd"></div>
-      <div class="chkb" id="ch-kb"></div>
-      <div class="cherr" id="ch-err"></div>
-      <div class="cbox" id="ch-cbox">
-        <div class="cboxl">Challenge Code</div>
-        <div class="cboxv" id="ch-cv"></div>
-        <div class="cboxh">Send this code — they enter it to guess your word</div>
+    <div class="chpanel on" id="ch-set">
+      <div class="chlabel">Type any 5-letter word (real or made up)</div>
+      <div class="chdisp" id="chdisp"></div>
+      <div class="chkb"   id="chkb"></div>
+      <div class="cherr"  id="cherr"></div>
+      <div class="codebox" id="codebox">
+        <div class="codelabel">Challenge Code</div>
+        <div class="codevalue" id="codevalue"></div>
+        <div class="codehint">Share this — they enter it to guess your word</div>
       </div>
-      <button class="fb" id="btn-gen">Generate Code</button>
-      <button class="fb cp" id="btn-copy" style="display:none">Copy Code to Clipboard</button>
+      <button class="fullbtn"           id="btn-gencode">Generate Code</button>
+      <button class="fullbtn copybtn"   id="btn-copycode" style="display:none">Copy Code</button>
     </div>
-    <div id="chep">
-      <div class="chl">Paste a challenge code</div>
-      <div class="ciw">
-        <input class="ci" id="ch-in" placeholder="Enter code..." maxlength="32" spellcheck="false" autocomplete="off">
-        <button class="cgb" id="btn-go">Go</button>
+    <div class="chpanel" id="ch-enter">
+      <div class="chlabel">Paste a challenge code</div>
+      <div class="chinwrap">
+        <input class="chinput" id="chinput" placeholder="Enter code…" maxlength="32" spellcheck="false" autocomplete="off">
+        <button class="chgobtn" id="btn-chgo">Go</button>
       </div>
-      <div class="cherr" id="ch-ent-err"></div>
-      <button class="fb" id="btn-start" disabled>Start Challenge</button>
+      <div class="cherr" id="chenterr"></div>
+      <button class="fullbtn" id="btn-startch" disabled>Start Challenge</button>
     </div>
   </div>
 </div>
 
 <script>
-// ── WORDS ──────────────────────────────────────────────
-const WORDS = new Set('aahed aalii abaci aback abaft abase abash abate abbey abbot abhor abide abies abing abler abode abort about above abuse abyss acerb ached aches acids acmes acorn acres acrid acted acute adage adapt added adder adept admin admit adobe adore adult aeons affix afire afoot afoul after again agape agate agave agent agile aging aglow agony agora agree ahead aided aides aimed aimer aioli aisle alarm album alert algae alibi alien align alike alive allay alley allot allow alloy aloft alone along aloof aloud alpha altar alter amass amaze amend amiss among ample amuse angel anger angle angry angst anime ankle annex annoy antic antsy anvil aorta apart aping apple apply apron aptly arbor ardor arena argot argue arise armed armor aroma arose array arrow arson ashen asked askew aspen asset atlas atone attic audio audit augur avail avert avian avoid award aware awash awoke axial azure bacon badly bagel baggy baker balmy bandy banjo baron basic basis baste batch bayou beach beady beard beats began begin beige being below bench berth bevel bible birch birth bison black blade blame bland blank blast blaze bleed bleep blend bless blimp blind bliss bloat block bloke blood bloom blown blues blunt blurt board bonus boost booze borax bored botch bound boxer brace braid brain brake brand brash brave brawn bread break breed briar brick bride brief brine bring brink briny brisk broad broil broke brook broth brown budge buggy build built bulge bully bunch bunny burly burnt butch buyer bylaw cabin cadet camel cameo cargo carol carom carry caste catch cause cavil cease cedar chafe chain chair champ chaos chase chasm cheap check cheek cheer chess chest chief child chive choir choke chore chump churn cigar cinch civet civic civil clack claim clams clang clank clash clasp class clean clear cleat cleft clerk click cliff cling cloak clone clout cluck clump clunk color comet comic comma copse coral coset couch cough could count court cover crack craft crane crash crave crazy cream creed creep crime crimp crisp croak croon cross croup crowd crown cruel crush crypt cubby curly curry curve cycle daddy daily daisy dance dandy datum daunt dealt death debut deify delay delta demon denim depot depth derby devil diary dirty disco ditty dodge dogma doing dolly doubt dough dowdy dowel draft drain drake drama drank drawl drawn dress drink drive droll drone drool droop dross drove drunk dryer dusky dusty dwarf dwell dying eager early ebony egret eight elbow elite elope email ember emcee emery empty enemy enjoy enter entry epoch equal equip error erupt essay ethyl evade every exact exert extol extra fable faint fairy faith fancy farce fatal fault fazed feast fence feral ferry fetal fetus fever field fiend fiery fifth fifty fight filth final first fixed flair flame flank flash fleas flint float flood floss flout flown fluff fluid fluke flung flunk flute foamy focal focus foggy force forge forte forth found foyer frame franc frank fraud freak fresh friar frisk fritz frond front frost froze fruit fudge fugue fully fungi funny furor gains gaudy gauze gavel gawky gecko geeky ghost ghoul giant giddy girth given glade glare glass gleam glean glint gloat globs gloom gloss glued gnash gnome going gorge gouge gourd grace grade graft grail grant grasp gravy graze great green greet grief grill grime grind gripe groan groom gross group grout grove growl grown gruel gruff grunt guard guava guide guile guilt gulch gully gusto gusts hairy handy hanky happy hardy harpy harsh haste haunt haven heady heart heave heavy hefty heist hence herbs herby heron hippo hippy hoard hoary hoist hokey holly homer honor horde horny horse hotel hotly hound house hubby human humor humph hunky hurly husky hussy hutch hyena hyper ideal igloo image imply index indie inept infer inlet inner input inter intro ionic irate islet issue italy ivory japan jaunt joint judge juice juicy jumbo jumpy juror kabob karma kayak kebab kinky kitty knave knelt knife knock known kooky krona kudos label lacey laffy lamed lanky lapel large larva latch layer leaky leapt learn leave leech legal leggy lemon letch level light limbo limit lingo liver livid local lodge lofty logic loopy lousy lover lower lowly loyal lucid lucky lunar lunch lusty lyric madam magic major maker manic manly manor maple march match matte mauve maybe mayor mealy medal media melee melon mercy messy metal might milky minor minty minus mirth mocha model mogul moldy money monks month moody moose moral moron morph motto moult mouse mouth movie mucky muddy muggy mulch mural music named nanny nasal nasty naval needy nerve nervy never nifty night nippy noble noise noisy north notch noted novel nurse nutsy nymph oaken occur ocean oddly offal offer often oiled oldie olive onion oozed opera optic orbit order other ovoid owned owner oxide ozone paddy paint panda panic pansy paper parka party patch patsy pause peace peach pearl penal penny perky pesky petal petty phase phone phony photo piano picky piety pilaf pilot pinch pinky piped pixel pizza place plaid plain plane plank plant plaza plead pleat plonk plotz plumb plume plunk poach podgy point poker polar polka poppy porch pouty power prank prawn preen press price pride prima prime primp print prior privy prize probe prone prose prove prowl proxy prude psalm psych pubic puffy pulpy pupil purge purse quaff qualm quash quasi queen quell query quest queue quick quiet quiff quill quirk quota quote rabbi rabid racer radar radio rafty rainy raise rally ramen ranch randy range rapid ratio raven rawly reach ready realm rebel rebut recto regal reign relay reply rerun resin retch retro rider ridge right rigid risky rival rivet robin robot rocky roman romeo rompy rough round route rover rowdy royal ruddy rugby ruler rumba rumor runty rural rusty sadly saint salad sassy satyr sauce savvy scale scaly scamp scary scene scoff scone scoop scope score scout screw seamy sedan sedge seedy serve seven shade shady shaft shake shall shame shape share shark sharp sheep sheet shelf shell shift shine shiny shire shirk shock shone shore short shout showy shrug shunt siege sieve sight silly since sinew sissy sixth sixty skied skill skimp skirt skulk skull slack slain slang slant slash slate slave sleek sleep sleet slept slice slick slide slime slimy slink sloop slope slosh sloth slump slunk slurp slyly smack smart smear smile smock smoke snake snaky snarl sneer snide sniff snore snort snuff softy solar solid solve sooth sorry south space spade spank spare spark spasm spawn speak spear speck speed spell spend spice spiel spike spill spine spoke spoof spook spool spoon sport spout spray spree sprig spunk spurn squad staff stage staid stain stake stale stalk stall stand stark start state stave stays steal steam steel steer stern stick stiff stile still stilt stink stint stock stomp stone stork storm story strap straw stray strip strut stuck study stump stunk style suede sugar suite sunny super surge surly swamp swarm swear sweat sweep sweet swept swift swill swing swipe swirl swoop sworn tabby table taboo tacit taffy talon tammy tango tangy taper tardy taste taunt taupe tawny tawse teach tears tease teeth tempt tepid terse thane there thick thief thing think third thorn those three threw throb throw thrum thumb tidal tiger tight timer timid tired titan tithe title today token topaz topsy torch total touch tough towel tower toxic toxin trace track trade trail train trait tramp trawl tread treat trend triad trial tribe trick tried trill tripe trite troop troth trout trove truce truck trump trunk trust truth tryst tuber tummy tumor tuned tuner turbo twang tweak tweed twice twill twist ulcer ultra umber umbra under unfit unify union unite unity unlit until upper upset urban usage usual utter vague valid value valve vapid vapor vault vaunt verse vicar video vigor viral virus visit visor vista vital vivid vixen vogue voice voila voile vomit voter vouch wacky waltz warty waste watch water weary weave wedge weedy weigh weird wells whack wheel where which whiff while whine white whole whose wispy witch witty woken woman world wormy worry worse worst worth would wrath wreak wreck wring wrist write wrong wrote yacht yappy yield yodel young youth zonal'.split(' ').map(w => w.toUpperCase()).filter(w => w.length === 5));
-const POOL  = [...WORDS];
+// ══════════════════════════════════════════
+// WORD LIST
+// ══════════════════════════════════════════
+const WORDS = `aalii aaron abaca aback abaff abaft abama abase abash abask abate abave abaze abbas abbey abbie abbot abdal abdat abeam abear abele abhor abide abidi abies abilo abkar abler ablow abmho abner abnet abode abody abohm aboil aboma aboon abord abort about above abram abret abrim abrin abrus absit abuna abura abuse abuta abuzz abwab abysm abyss acana acapu acara acari acate accoy acedy acerb achar achen acher achor acier acker ackey aclys acmic acock acoin acold acoma acone acorn acrab acred acrid acroa acron acrux acryl actin acton actor acuan acute adage adapa adapt adati adawe adawn adays addax added adder addie addle adead adeem adeep adela adept adfix adiel adieu adion adjag adlai adlay adlet adman admin admit admix adnex adobe adopt adore adorn adown adoxa adoxy adoze adpao adrip adrop adrue adult adunc adusk adust adyta adzer aedes aegis aegle aequi aeric aerie aevia aface afara afear affix afifi afire aflat aflow afoam afoot afore afoul afret afric after agade again agama agami agamy agape agasp agate agaty agave agaze agena agent agger aggie aggry aggur aghan agiel agile aging agist agita aglet agley aglow agnel agnes agnus agoge agoho agone agony agora agrah agral agree agria agrin agrom agsam aguey agush agust ahead aheap ahind ahint ahmed ahmet ahong ahsan ahull ahunt ahura ahush ahwal aider aides ailie aillt aimak aimee aimer ainoi airan airer aisle aitch aiwan aizle ajaja ajari ajava ajhar ajuga akala akali akasa akebi akeki akkad aknee akpek akule akund alack alada alain alaki alala alamo aland alani alans alarm alary alate alawi alban albee albin album albus albyn alcae alces alcor alder aldim aldol aldus aleak aleck aleft aleph alert aleut alfet alfur algae algal algic algid algin algol algor algum alias alibi alice alick alida alids alien align alike alima aline alish aliso alisp alist alite alive alkes alkyd alkyl allah allan allay allen aller alley allie allot allow alloy allyl alman almon almud almug alnus alody aloed aloft alogy aloid aloin alois aloma alone along aloof alosa alose aloud alowe alpax alpen alpha alpid altar alter altho altin altun aluco alula alure aluta alvah alvan alvar alvin alvus alway amaas amadi amaga amain amala amang amani amapa amara amass amati amaze amban ambar ambay amber ambit amble ambon ambos ambry ameed ameen amelu amend amene ament amhar amice amide amido amigo amine amini amino amish amiss amita amity amman ammer amnia amnic amoke amole among amort amour amove amper ample amply ampul ampyx amsel amuck amula amuse amuze amvis amylo anabo anama anana anasa ancha ancon andre anear anele anend anent angel anger angie angka angle angor angry angst angus aniba anice anigh anile anima anime animi anion anise anita anjan anjou ankee anker ankle ankou ankus annal annam annat annet annex annie annoy annul anode anoil anole anoli anomy anous ansar ansel anser antal antar antes antic anton antra antre antum anura anury anvil anzac aoife aorta aotea aotes aotus apace apaid apama apart apeak apert aperu apery aphid aphis aphra apian apiin apina aping apios apish apism apium apnea apoda apoop aport apout appay appet apple apply april apron apsis aptal aptly araba araby araca arado arain arake aramu arara arati araua arawa arbor arche archy arcos ardea ardeb ardor ardri aread areal arean arear areca areek areel arena arend areng arent arete argal argas argel argid argil argol argon argot argue argus arhar arhat arian ariel aries arioi arion ariot arise arist arite arius arjun arkab arles armed armer armet armil armor arneb arnee arnut aroar arock aroid aroma aroon arose arpen arrah arras arrau array arrie arris arrow arses arsis arsle arson arsyl artal artar artel artha artie aruac aruke arulo arupa arusa arval arvel aryan arzan arzun asale asana asaph asarh ascan ascii ascon ascot ascry ascus asdic ashen asher ashes ashet ashir ashur asian aside askar asker askew askip askos aslop asoak asoka aspen asper aspic assai assam assay asset assis astay aster astir astor astur asuri asway aswim asyla atavi ataxy ateba atelo athar atilt atlas atlee atman atmid atmos atnah atoke atoll atomy atone atony atopy atour atria atrip attar atter attic attid atule atune atwin atypy aucan audio audit aueto augen auger aught augur aulae aulic auloi aulos aumil aurae aural aurar auric aurin aurir aurum auryl autem auxin avahi avail avars avast avena avens avera avert avery avian avick avine aviso avoid awabi awaft await awake awald awalt awane award aware awash awave awber aweek aweel awest aweto awful awhet awhir awide awing awink awiwi awned awner awoke awork axial axile axine axiom axion axite axled axman axoid ayelp aylet ayllu ayond ayont ayous azide azine azoch azofy azoic azole azote azoth azoxy aztec azure azury azyme babai babby babel baboo babua babul bacao bacca bache bacis bacon badan badge badly badon baffy bafta bagdi bagel baggy bagre bahai baham bahan bahar bahay bahoe bahoo bahur bahut baioc bairn baith baize bajan bajau bajra bajri bakal baked baken baker bakie bakli balai balak balan balao balas baldy balei baler balky balli bally balmy baloo balor balow balsa balti balut balza banak banal banat banba banca banco banda bande bandi bando bandy banff banga bange banig banjo banky banns bantu banty banya barad barbe bardo bardy barer barff barge bargh baria baric barid barie baris barit barky barmy barny baroi baron barra barry barse barth barye basal based bases basic basil basin basis bason basos bassa basso basta baste basto batad batak batan batch batea bated batel bater bathe batik batis baton batta batty batwa baubo bauch baume bauno baure bauta bavin bawra bayal bayed bayok bayou bazoo beach beady beaky beala beamy beano beant beany beard bearm beast beata beath beaut beaux bebar bebat bebay bebed bebog bebop becap becky becry becut bedad beday bedel beden bedew bedim bedin bedip bedog bedot bedub bedur bedye beech beefy beery beest beeth beety beeve befan befit befog befop begad begar begat begay begem beget begin begob begum begun begut behap behen beice beige being beira beisa bejan bejel bejig bekah bekko belah belam belar belay belch belee belga belie belis bella belle belly below belve bemad beman bemar bemat bemba bemix bemud benab bench benda bendy benet benin benjy benne benny bensh benty benzo beode bepat bepaw bepen bepun berat beray beret bergy berne beroe berri berry berth beryl beryx besan besee beset besin besit besom besot bespy besra bessi bessy betag betel betis betso betsy betta betty bevel bever bevue bewet bewig bezel bezzi bezzo bhaga bhalu bhang bhara bhava bhili bhima biabo bibio bible bichy bidar biddy bider bidet bidri bield bifer bifid bigha bight bigot bihai biham bijou bikol bilbo bilby bilch bilge bilgy bilic bilin bilio billa billy bilsh binal binge bingo bingy binna biome biose biota biped bipod birch birdy birle birma birny biron birse birsy birth bison bisti bitch biter bitis bitty biune bixin bizen bizet black blade blady blaff blain blair blake blame blanc bland blank blare blart blase blash blast blate blaze blazy bleak blear bleat bleck bleed blend blent bless blest blibe blick blimp blimy blind blink bliss blite blitz blizz bloat block bloke blood bloom bloop blore blout blown blowy bluer blues bluet bluey bluff blunk blunt blurb blurt blush blype board boast bobac bobby bocal bocca bocce boche bocoy boden boder bodge bodhi bodle bogan bogey boggy bogie bogle bogue bogum bogus bohea bohor boiko boily boist bokom bolag bolar boldo boldu boled bolis bolly bolti bolus bombo bonbo bonce boned boner boney bongo bonny bonus bonze booby boody booky booly boomy boone boonk boort boose boost boosy booth boots booty booze boozy borak boral boran borax boree borer borgh boric boris borne boron borty bortz boryl bosch boser bosky bosom bossy bosun botch bothy bouge bough boule bound bourd bourg bourn bouse bousy bouto bovid bowed bowel bower bowet bowie bowla bowls bowly boxen boxer boxty boyar boyce boyer boyla bozal bozze braca brace brach brack bract bragi brahm braid brail brain brake braky brand brank brant brash brass brava brave bravo brawl brawn braws braxy braza braze bread break bream breba breck brede bredi breed breek breme brent breth brett breva breve brian briar bribe brick bride brief brier brill brine bring brink briny brisk briss brith briza brizz broad broch brock broil broke broll broma brome bronc bronk bronx brood brook brool broom broon brose brosy broth brown bruce brugh bruin bruit bruke brule brume bruno brunt brush bruta brute bruzz bryan bryce bryum buaze bubal bubby bucca bucco buchu bucko bucky buddh buddy budge buffy bugan buggy bugle bugre build built buist bukat bulak bulby bulge bulgy bulky bulla bully bulse bumbo bumpy bunce bunch bunda bundu bundy bunga bungo bungy bunko bunny bunty bunya buran burao burel buret burgh burin burka burke burly burnt burny burro burry bursa burse burst burut busby bushi bushy busky bussu butch butea buteo butic butsu butte butty butyl butyn butyr buxom buxus buyer buzzy bylaw bynin byous byron bysen byway caama cabal caban cabas cabby cabda caber cabin cabio cable cabob cabot cacam cacan cacao cache cacti cacur caddo caddy cader cadet cadew cadge cadgy cados cadre cadua cadus caeca caffa cafiz caged cager cagey caggy cagit cahiz cahot cahow caird cairn cairo caite cajan cajun caker cakey calas caleb calid calix calla calli callo calmy calor calve calyx caman camel cameo campa campe campo camus canal canch candy canel caner canid canis canna canny canoe canon canso canto canty canun caoba capax caped capel caper capes capon capot cappy capra capri capsa carat carbo cardo carer caret carex carga cargo carib carid carlo carls caroa carob carol carom carry carse carte carty carua carum carve carya caryl casal casco cased casel caser casey casha casse caste catan catch cater catha cathy catti catty cauch cauda cauld cauma caupo cause cavae caval cavel cavia cavie cavil cavus cawky caxon ccoya cease cebid cebil cebur cebus cecil cedar ceder cedre cedry ceiba ceibo ceile celia cella cello cense cento ceorl cequi ceral ceras cerci cered cerer ceria ceric cerin certy ceryl cetic cetid cetin cetus cetyl chack chaco chafe chaff chaft chaga chain chair chais chait chaja chaka chalk chama champ chane chang chank chant chaos chape chaps chapt chara chard chare chark charm charr chart chary chase chasm chati chaui chauk chaus chawk chawl chaya chazy cheap cheat check cheek cheep cheer cheet cheir cheka cheke cheki chela chelp chena cheng chera chert chess chest cheth cheve chevy chewy chiam chian chick chico chide chief chien child chile chili chill chime chimu china chine ching chink chino chint chiot chips chirk chirm chiro chirp chirr chita chive chloe chlor choca chock choco choel choes choga choil choir choke choky chola chold choli cholo chomp choop chopa chora chord chore chort chose chott choup chous chowk choya chria chris chuck chude chufa chuff chuje chump chunk churl churm churn churr chute chyak chyle chyme cibol cicad cicer cider cigar cigua cilia cimex cinch cinct cindy cinel circa circe cirri cisco cista citee citer citua civet civic civil civvy clack claim clamb clame clamp clang clank clapt clara clare clark claro clart clary clash clasp class claut clava clave clavy clawk clead cleam clean clear cleat cleck cleek cleft clerk cleve click cliff clift clima climb clime cline cling clink clint clips clipt clite clive cloak cloam clock cloff cloit clomb clone cloof cloop cloot close closh clote cloth cloud clour clout clove clown cluck cluff clump clung clunk clyde clyer clype cnida coach coact coaid coaly coapt coarb coast coati coaxy cobby cobia coble cobra cobus cocci cocco cocky cocle cocoa cocos coder codex codol codon cogon cogue cohen cohol coign coiny coker colan colic colin colla colly colon color colza comal coman comby comer comes comet comfy comic comid comma comox compo comus conal conch coned coner cones conga congo conic conin conky conor conoy conte conto conus cooba cooee cooer cooja cooky cooly coomb coomy coony coorg coost copal copei copen coper copis coppy copra copse copsy copus coque corah coral coram cordy cored coree corer corey corge corgi corin corke corky cornu corny coroa corol corps corse corta coryl cosec coset cosse costa cotch cothe cothy cotta cotte cotty cotys couac couch coude cough could couma count coupe courb cours court couth coved cover covet covey covid covin cowal cowan cower cowle coxal coyan coyly coyol coypu cozen crack craft craig crain crake cramp crane crank crape craps crapy crare crash crass crate crave cravo crawl crawm craze crazy creak cream creat credo creed creek creel creem creen creep crena crepe crept crepy cress crest creta crete cribo crick cried crier criey crile crime crimp crine crink crisp criss crith croak croat croci crock croft crome crone cronk crony crood crook crool croon crore crosa cross croup crout crowd crowl crown croze cruce cruck crude cruel cruet crumb crump crunk crunt cruor cruse crush crust cruth crypt ctene cuban cubby cubeb cuber cubic cubit cuddy cueca cueva cuffy cujam culet culex culla cully culmy culpa cumal cumar cumay cumbu cumic cumin cumol cumyl cunan cunas cunye cunza cupay cupel cupid cuppy curby curch curdy curer curie curin curio curly curry cursa curse curst curua curve curvy cusec cushy cusie cusso cutch cutie cutin cutis cutty cutup cyath cycad cycas cycle cylix cymar cymba cymry cynic cypre cyril cyrus cyton czech dabba dabby dabih dacus dadap daddy daffy dafla dagga daggy daijo daily daira dairi dairy daisy daiva daker dakir dalar dalea daler dalle dally daman damia damie damme damon dampy danai dance danda dandy danic danio danli danny danta darac daraf darat darby darci daren darer dares dargo daric darii darin darky daroo darst darts daryl dashy dasnt dassy dasya datch dater datil datum daube dauby daunt dauri daven daver david davit dawdy dawny dawut dayal dazed deair dealt deary deash death deave debar debby deben debit debus debut decad decal decan decap decay decil decke decoy decry decus decyl dedan deedy defat defer defog degas degum deice deify deign deink deino deism deist deity dekko dekle delay delft delhi delia della delta delve demal demit demob demon demos denat denda deneb denim denis dense denty deota depas depoh depot depth derah derat deray derby derek deric derma derry desex desma dessa desyl detar detax deter detin detur deuce devil devon devow dewan dewax dewer dewey dhabb dhava dheri dhobi dhole dhoni dhoon dhoti dhoul dhyal diact diamb diana diane diary dicer dicky dicot dicta diddy didie didle didna didnt didst didus didym diego diene dieri difda dight digit digor diker dildo dilli dilly dimer dimit dimly dimna dimps dinah dinar diner dinge dingo dingy dinic dinka dinky dinus diode dione dioon diose diota dioxy dipus dirca dirge dirty disme disna dital ditch diter ditto ditty divan divel diver divot divus divvy dixie dixit dizen dizzy djave djuka dobby dobla dobra doddy dodge dodgy doest dogal doggo doggy dogie dogly dogma dogra doigt doily doina doing dolia dolly dolor dolph domal domba domer domic dompt donal donar donax donee donet doney donga donia donna donne donor donum dooja dooli dooly dooms doper dopey dorab dorad doree doria doric doris dorje dormy dorts dorty doser dosis dotal doted doter dotty douar doubt douce dough douse dover dowdy dowed dowel dower dowie downy dowry dowse doyle dozed dozen dozer draba draco draff draft drago drail drain drake drama dramm drang drank drant drape drate drawk drawl drawn dread dream drear dreep dregs dreng dress drest drias dried drier drift drill drink drinn drisk drive drogh droit droll drome drona drone drony drool droop dropt dross droud drouk drove drovy drown druid drung drunk drupa drupe druse drusy druxy dryad dryas dryly dryth duala duali duane dubba dubby dubhe ducal ducat duces duchy dugal duhat dujan dukhn dulat duler dulia dully dulse dumba dummy dumpy dunal dunce dunch dungy dunne dunny dunst duole duper dupla duple duppy dural durax durio duroc durra durry durst duryl dusio dusky dusty dusun dutch dutra duvet dwale dwalm dwang dwarf dwell dwelt dwine dwyka dyaus dying dyker dylan eager eagle eagre eared earle early earth easel easer eaten eater eaved eaver eaves ebony echea echis ecize eclat ecoid ecole ectad ectal edana edder eddic eddie edema edgar edged edger edict edify edith ediya edoni educe educt edwin eeler eerie effie egest egger egret egypt eider eight eigne eimak eimer eject ekaha eking ekron elain eland elaps elate elbow elder eldin elean elect elegy elemi eleut elfic elfin elian elias elide elihu eliot elite eliza ellen elmer eloah eloge elope elops elric elsin elude elute elvan elver elves elvet elvis elymi embar embay embed ember embog embow embox embus emcee emeer emend emery emesa emily emmer emmet emote empeo empty enact enage enapt enarm enate encup ended ender endew endow endue eneas enema enemy engem enhat eniac enjoy ennui enoch enoil enorm enray enrib enrol enrut ensky ensue entad ental enter entia entry enure envoy enzym eosin epact ephah ephod ephor epoch epode epopt eppie epsom epulo equal equid equip equus erade erase erava erbia erect erept ergal ergon ergot erian erica erick erika erizo ernie ernst erode erose error ersar eruca eruct erupt ervum erwin eryon esere eshin esker essay essed essex essie ester estoc estop estre estus ethal ethan ethel ether ethic ethid ethos ethyl ettle etude eupad eurus eusol evade evase evens event evert every evict evoke ewder ewery exact exalt excel exdie exeat exert exile exist exite exlex exode exody expel exter extol extra exude exult eying eyoty eyrie eyrir fabes fable faced facer facet facia facks facty faddy faded faden fader fadge faery faffy fager fagot fagus faham fains faint fairm fairy faith faker fakir falco fally false fanal fanam fancy fangy fanny fanon fanti fanwe farad farce farcy farde fardh fardo farer farmy farse farsi fatal fated fatil fatly fatty fatwa faugh fauld fault fauna fause faust fauve favor favus fawny fayal feast featy feaze fecal feces fedia feedy feere feeze feign feint feist felid felis felix felly felon felty felup femic femur fence fendy fenks fenny feoff ferae feral feria ferie ferio ferly ferme ferny ferri ferry feste fetal fetch fetid fetor fetus feuar feued fever fezzy fiard fiber fibry fiche fichu ficus fidac fides fidge fidia field fiend fient fiery fifer fifie fifth fifty figgy fight fikie filao filar filch filer filet filix filly filmy filth final finch finer fingu finis finny fiord fique firca fired firer firry first firth fishy fisty fitch fitly fitty fiver fives fixed fixer fizzy fjeld flack flaff flail flair flake flaky flamb flame flamy flane flank flare flary flash flask flavo flawn flawy flaxy fleam fleay fleck fleer fleet flesh fleta flews flick flier flimp fling flint flipe flirt flisk flite float flock floey flong flood floor flora flory flosh floss flota flour flout flown floyd flued fluer fluey fluff fluid fluke fluky flume flump flung flunk fluor flurn flurr flush flusk flute fluty flyer flype foaly foamy focal focus fodda foder fodge foehn fogey foggy fogle fogon fogou fogus fohat foism foist foldy folia folie folio folky folly fomes fondu fonly foody foots footy foppy foray forby force fordo fordy forel forge forgo forky forme formy forst forte forth forty forum fosie fossa fosse fotch fotui found fount foute fouth fovea foxer foyer frack fraid fraik frail frame franc frank frase frass fraud frawn frayn fraze freak fream freck freed freer freet freir freit fremd freon fresh frett freya freyr friar fried frier frija frike frill frisk frist frith fritt fritz frize frizz frock frond front froom frore frory frosh frost froth frowl frown frowy froze fruit frump frush fryer fubby fubsy fucus fuder fudge fudgy fuffy fugal fuggy fugle fugue fulah fully fulth fultz fulup fulwa fumer fumet fundi funds fungi fungo funis funje funky funny fural furan furca furil furor furry furud furyl furze furzy fused fusee fusht fusil fussy fusty fusus futwa fuzzy gabby gable gaddi gadge gadid gadus gaffe gagee gager gagor gaily gaine gains gaize galah galax galea galee galei galen galet galey galga galik galla galli gally galop gamba gamic gamin gamma gammy gamut ganam ganch ganda ganef ganga gange ganja gansy ganta ganza gaper gapes gappy garad garce gardy gareh garle garoo garse garth garum gasan gashy gaspy gassy gatch gated gater gatha gator gauby gaudy gauge gault gaumy gaunt gaura gauss gauze gauzy gavel gavia gawby gawky gayal gazee gazel gazer gazon gease gebur gecko geese geest geira gekko gelid gelly gemel gemma gemmy gemot gemul genal genep genet genic genie genii genin genip genny genoa genom genos genre genro genty genua genus genys geode geoff geoid geoty gerah gerbe gerim gerip germy gesan gesso geste getae getah getic getup geyan ghazi ghent ghoom ghost ghoul giant gibbi gibby gibel giber gibus giddy gigot giles gilia gilim gilly gilpy gilse gimel ginny gipon gippy girba girly girny girse girsh girth gisla given giver givey glace glack glade glady glaga glaik glair glaky gland glans glare glary glass glaum glaur glaux glaze glazy gleam glean gleba glebe glede gledy gleed gleek gleet glenn glent glial glide gliff glime glink glint glisk gloam gloat globe globy gloea glome gloom glore glory gloss glost glout glove gloze gluck glued gluer gluey gluma glume glump glynn glyph gnarl gnash gnawn gnome goala goaty goave goban gobbe gobby gobia gobio godet godly goety gogga going goldi goldy golee golem golgi golly goloe golpe gomer gonad gonal gondi goner gonia gonid gonne gonys goods goody goofy gools gooma goose goosy goral goran gorce gorer gorge goric gorra gorry gorse gorsy gossy gotch gotha gotra gouda goudy gouge goumi goura gourd gouty gowan goyim goyin goyle grace grade graff graft grail grain graip grama grame gramp grand grane grank grano grant grape graph grapy grasp grass grate grave gravy graze great grebe grebo grece greed greek green greet grege gregg grego grein greta grice gride grief griff grift grike grill grime grimp grimy grind gripe gripy grist grith grits groan groat groff groin groom groop groot grope gross grosz grouf group grout grove grovy growl grown grubs gruel grues gruff gruis grume grump grunt grush gruss gryde guaba guaco guaka guama guana guano guara guard guasa guato guava guaza gubbo gucki gudge gudok guess guest guffy gugal guiba guide guido guige guijo guild guile guilt guily guise gujar gulae gular gulch gules gulfy gulix gully gulpy gumbo gumby gumly gumma gummy gundi gundy gunge gunne gunny guppy guran gurge guric gurly gurry gushy gusla gusle gusto gusty gutta gutte gutti gutty guyer guzul gweed gwely gwine gyges gygis gymel gynic gyppo gypsy gyral gyric gyron gyrus habab habbe habit hache hacky haddo hades hadji hafiz haggy hagia haida haikh haily haine haire hairy hajib hakam hakea hakim hakka halal halch haler halma haloa halse halve hamal hamel hammy hamsa hamus hamza hance hanch handy hange hanif hanky hanna hansa hanse haole haoma haori haply happy harbi hardy harem harka harpa harpy harry harsh hasan hashy hasky hasta haste hasty hatch hater hathi hatti hatty haugh hauld haulm haunt hausa hause havel haven haver havoc hawer hawky hawok hawse hayey hazel hazen hazer hazle heady heald heaps heapy heart heath heave heavy hecte heder hedge hedgy heedy heeze heezy hefty heiau heidi heigh heinz helen helge helio helix hello helly heloe helot helve hemad hemal hemen hemic hemin hemol hempy henad hence henna henny henry hepar herat herby herem herma hermo herne heron herse hertz herve hetty heuau heugh hevea hewel hewer hexad hexer hexis hexyl hiant hiate hided hider hield hienz hight hiker hilch hilda hilly hilsa hilum hilus hinau hinch hindi hindu hinge hinny hiper hippa hippo hippy hiram hired hiren hirer hirse hispa hitch hithe hiver hives hoard hoary hoast hobby hocco hocky hocus hoddy hogan hoggy hogni hoick hoise hoist hokan hokey hokum holer holey holia holla hollo holly homam homer homey honda hondo honey honor honzo hooch hooey hoofs hoofy hooky hooly hoose hoosh hoove hoped hoper hoppy horal horde horim horme horny horse horst horsy hosed hosel hosta hotch hotel hotly hotta hough hound houri house housy hovel hoven hover howdy howea howel howff howso hoyle hsuan huaca huaco huari huave hubba hubby hucho huffy hulky human humbo humet humic humid humin humor humph humpy humus hunch hundi hunks hunky hurds hurly huron hurri hurry hurst hurty husho husky hussy hutch hutia huzza hybla hydra hydro hyena hying hyleg hylic hymen hynde hyoid hyper hypha hypho hyrax hyson iambe iambi ianus iberi ibota icaco iceni ichor icica icily icing ictic ictus idaho idaic idant iddat iddio ideal idean idgah idiom idiot idism idist idite idler idola idose idryl ierne igara igdyr igloo ihlat ihram ijore ikona ileac ileon ileum ileus iliac iliad ilial ilian iliau ilima ilium illth iloko image imago imban imbat imbed imber imbue imide imine imino immew immit immix impar impel impen imply impot imshi inaja inane inapt inarm incan incog incur incus incut indan index india indic indra indri indue indus indyl inept ineri inerm inert infer infit infix infra inger ingle ingot inial inigo inion injun inken inker inket inkle inkra inlaw inlay inlet inner innet inoma inone inorb input inrub inrun insea insee inset inter intil intue inula inure inurn invar inwit iodic iodol ionic iowan iphis irade irani iraqi irate irena irene irfan irgun irian irish iroha iroko irone irony irpex irvin irwin isaac isawa iseum isiac islam islay islet islot ismal issei issue istle itala itali itchy itcze itemy ither ivied ivory ixion ixora izard izote iztle izumi jabia jabot jabul jacal jacko jacky jacob jaded jagat jager jaggy jagir jagla jagua jahve jaime jaina jakes jakob jakun jalap jaman jambo james jamie jammy janet janos jantu janua janus japan japer japyx jared jarmo jarra jarry jasey jason jatha jatki jatni jaunt javan javer jawab jawed jazzy jeans jeany jebus jeery jehup jelab jelly jemez jemmy jenna jenny jerez jerib jerky jerry jesse jesus jetty jewel jewry jheel jhool jibby jiboa jiffy jiggy jihad jimmy jingo jinja jinks jinni jinny jiqui jirga jitro jixie jocko jocum jodel johan joint joist joker jokul jolly jolty jonah jonas jones joola joree jorge jorum joshi josie josip jotty jough joule jours joust jowar jowel jower jowly jowpy joyce juang jubbe judah judas judex judge jufti jugal juger jugum juice juicy julep jules julia julid julie julio julus jumba jumbo jumby jumma jumpy junco junta junto jupon jural jurat jurel juror jussi justo jutic jutka jutty juvia juyas kabel kadmi kados kafir kafiz kafka kafta kahar kahau kaimo kaiwi kajar kakan kakar kakke kalon kamao kamas kamba kamel kamik kanae kanap kanat kande kaneh kanga kanji kansa kapai kapok kappa kappe kapur kaput karbi karch karel karen karma karou karri karst kasha kashi kaska kassu katar katha kathy katie katik katun kauri kayak kayan kazak kazoo keach keawe kebab kecky kedar kedge keech keena keest keeve kefir kefti keita keith keleh kelek kelep kella kelly kelpy kelty kemal kempt kempy kenaf kenai kench kenno kerat kerel keres kerri kerry keryx ketal ketch keten ketol kette ketty ketyl kevan kevel kevin kevyn keyed khadi khair khaja khaki khami khasa khasi khass khaya khila khmer khoja khoka khond khuai khula khuzi khvat kiack kiaki kiang kibei kiddy kieye kikar kikki kilah kilan kileh kiley kilim killy kimmo kinah kinch kingu kinky kioea kioko kiosk kiowa kippy kirve kishy kisra kissy kiswa kitab kitan kitar kithe kitty kiver kiwai kiyas kizil klaus kling klops klosh knack knape knark knave knead kneed kneel knell knelt knezi kniaz knick knife knock knoll knosp knout knowe known knurl knute knyaz koala koali koban kobus kodak kodro koeri kogia kohen kohua koila koine kokam kokan kokil kokio kokra kokum kolea kolis kombu konak konde kongo kongu konia kooka koorg koppa korah koran korec korin koroa korwa kosin kotal kotar kouza kovil koyan kraal kraft krait krama kraut kreis krems kreng krepi krina krome krona krone kroon krosa kubba kudos kudzu kufic kugel kukri kukui kulah kulak kuman kumbi kumni kumyk kunai kunbi kurku kurmi kurus kusam kusan kusha kusti kusum kvass kvint kwapa kyack kylix kyrie kyung laang laban labba label labia labis labor labra lacca laced lacer lacet lache lacis lacto laden lader ladik ladin ladle laeti lagan lagen lager lagna laich laigh laine laird lairy laity laker lakie lamba lamby lamel lamia lamin lammy lamna lamus lamut lanao lanas lanaz lance laney langi lango lanky lanny lanum lapel lapon lappa lapse lapsi larch lardy large largo laria larid larin larix larky larry larus larva larve laser lasso lasty latah latax latch lated laten later latex lathe lathy latin latro latus lauan laugh lauia laund laura laver lavic lawny lawzy laxly layer layia layne lazar leach leads leady leafy leaky leant leapt learn lease leash least leath leave leavy leban leden ledge ledgy ledol ledum leech leeky leery legal leger leges leggy legit legoa legua lehua leigh leila leith lekha lelia leman lemel lemma lemna lemon lemur lenad lenca lench lendu lenis lenny lenth lento leora lepas leper lepra lepus lerot lerwa lesgh lesiy lessn letch lethe letty letup leuch leuco leuma leung levee level lever levin levir levis lewie lewis lewth lexia lhota liana liang liard libby libel liber libra licca lichi licit liege liesh lieue lieve lifer lifey ligas light ligne liken liker likin lilac liman limax limbo limbu limby limen limer limes limey limit limma limmu limpy limsy linch linda lindo linea lined linen liner linet linga linge lingo lingy linha linie linin linja linje links linky linne linon linos linty linum linus lipan lipin lippy lisle litas litch liter lithe lithi litho lithy litra litus lived liven liver livid livor livre liwan llama llano lloyd lludd loach loamy loasa loath loave lobal lobar lobby lobed local lochy locky locum locus lodge lodha lodur loess lofty logia logic logie login logoi logos lohan lohar lokao loket lolly longa longe longs looby loony loopy loose loper loppy loral loran lordy lored loren loric loris lorry lorum losel loser lotic lotta lotte lotto lotus louch louey lough louie louis loulu loupe louse lousy louty lover lowan lower lowly lowth loxia loxic loyal lubra lucan lucet lucia lucid lucky lucre luffa luger luian luigi luite lukas lulab lumen lummy lumpy lunar lunch lunda lunel lunes lunge lungi lungy lunka lupid lupis lupus lural lurch lurer lurid lurky lurry lushy lusky lusty lutao luteo luter lutra luxus lyard lycid lycus lydia lyery lying lymph lynch lynne lyric lyrid lysin lysis lyssa lytic lytta mabel macan macao macaw macco macer machi macle macon macro madam madge madia madid madly madoc mafic mafoo magas maggy maghi magic magma magog magot mahar mahdi mahoe mahra mahri mahua maida maidu maidy maiid maine mains maint maire maius maize major makah maker makua makuk malar malax malay maleo malic malik malmy malto malty malus malva mamba mambo mamie mamma mammy manal manas mande maned manei manes maney manga mange mangi mango mangy mania manic manid manis maniu manly manna manny manoc manor manse manso manta manto manul manus maori mapau maple mappy maqui marae maral march marci marco mardy marek marge maria marid marie mario maris marka marko marla marli marly marok marry marsh marsi martu marty masai masha mashy mason massa masse massy masty matai matar matax match mater matey matin matka matra matsu matta matte matti matty matzo maugh maund mauri mauve mavis mawky maxim mayan maybe mayda mayer mayey maynt mayor mazda mazed mazer mazic mazur mazut mbaya mbori mbuba mckay mealy meant mease meaty mecca mecon medal media medic medio medoc meece meeks meese meggy meile meith melam melas melch melee meles melia melic meloe melon melos mende mendi mends menic mensa mense mensk merak merat merch mercy merel merge mergh meril merit merle merop meros merry merse mesad mesal mesem meshy mesic mesne meson messe messy mesua metad metal metel meter metic metin metis metol metra metze meuse meute mewer mezzo miami miaow miasm miaul micah miche micht micky micro middy mider midge midgy midst miffy might mikey mikie mikir milan milch miler miles milha milky milla mille milly milpa milty mimeo mimer mimic mimly mimus minar mince miner mines minge mingo mingy minim minny minor minos minot minty minus miqra mirac mirak mirid mirth mirza misdo miser misgo misky missy misty mitch miter mitis mitra mitre mitty mitua mixed mixen mixer mizar mizzy mneme mnium mobby mobed moble mocha mocoa modal model modoc moggy mogul mohar mohel mohur moira moire moise moism moist moity mokum molal molar moldy moler molge molka molle molly molpe momme mommy momus monad monal monas monel moner money mongo monny monte month montu monty mooch moody mools moony moore moorn moors moory moosa moose moost mooth mopan moper mopla moppy mopsy mopus moqui moral moran morat moray mordv morel mores morga moric morin mormo morne moroc moron morph morse morth morus moses mosey mosgu mossi mossy moste mosul mosur moted motel moter motet motey mothy motif motor motte motto moudy mould moule mouls mouly mound mount mourn mouse mousy mouth mover movie mowch mower mowha mowie mowra mowse mowth moyen moyle mpret muang mucic mucid mucin mucky mucor mucro mucus mudar mudde muddy mudee mudir mudra muffy mufti mufty muggy mugil muist mukri mukti mulch mulct muley mulga mulla mulse mummy mumps munch munda munga munge mungo mungy munia muong mural muran murat murex murga murid murky murly murmi murph murra murre murut murva murza musal musar musca musci mused muser musgu musha mushy music musie musky mussy musty mutch muter mutic muzzy myall mymar myoid myoma myope myops myopy myron myrrh mysel mysid mysis nabak nabal nabby nabla nable nabob nacre nacry nadir naggy naght nagor nahor nahua nahum naiad naias naily nairy naish naive naked naker nakir nakoo namaz nambe namda namer nance nancy nanda nandi nandu nanes nanga nanny nantz naomi naoto napal napoo nappe nappy naren nares naric narky narra nasab nasal nasch nassa nasty nasua nasus natal natch nates nathe natty naumk naunt naval navar navel navet navew navvy nawab nayar nazim nazir neath nebby nebel neddy needs needy neeld neele neese neeze neffy neger negro negus neigh neist nejdi nelly nenta neoza nepal neper nerve nervy nesty neter netop netty neuma neume nevel never nevoy nevus newar newel newly newsy nexal nexum nexus ngaio ngapi ngoko niall niata nibby niche nicky nicol nidal nidge nidor nidus niece niels niepa nieve nific nifle nifty nigel night nigre nigua nihal nikau nikko nilot nimbi ninja ninny ninon ninox ninth nintu ninut niobe niota nippy nisan nisei nisse nisus nitch niter nitid niton nitro nitty niuan nival nixie nizam njave nobby noble nobly nodal noddy noded nodus noemi nogai nogal nohow noily noint noise noisy nokta nolle nomad nomic nomos nonce nonda nondo nones nonet nonic nonly nonya nonyl nooky noose nopal norah noria noric norie norma norna norse norsk north nosed noser nosey notal notan notch noted noter notum notus novel novem noway nowed nowel noxal noyau nubby nubia nucal nucha nucin nudge nullo numda numen nummi numud nunch nunki nunky nunni nuque nurly nurse nursy nutty nyaya nydia nylon nymil nymph nyoro nyssa nyxis oadal oaken oakum oared oaric oasal oases oasis oaten obeah obese obley obole occur ocean ocher ochna ochro ocote ocque ocrea octad octan octet octic octyl ocuby oddly odeon odeum odist odium odoom oecus oenin offal offer often ofter oftly ogeed ogham oghuz ogive ogler ogmic ohelo ohmic oiled oiler oisin okapi okrug olcha olchi olden older oldie oleic olein olena olent oliva olive ollie ology olona olson omaha omani omber omega omina omlah oncia oncin onery onion onium onkos onlay onmun onset ontal onymy oolak oolly oopak oopod ootid opata opera ophic ophis opine opium optic orach orage orang orant oraon orary orate orbed orbic orbit orcin order oread oreas organ orgia orgic orgue orias oribi oriel orion oriya orlet orlop ormer ornis oromo orris orsel orson ortet ortho ortol ortyx oryza osage oscan oscar oscin osela oshac oside osier oskar osmic osmin osone ossal osset ostic otary otate other othin otkon otomi ottar otter otyak ouabe ought ouija oukia oulap ounce ounds ouphe ourie outby outdo outed outen outer outgo outly outre ouzel ovant ovary ovate overt ovest ovile ovine ovism ovist ovoid ovolo ovula ovule owght owing owler owlet owner owsen owser oxane oxbow oxboy oxeye oxfly oxide oxime oxlip oxman oxter oyana ozark ozena ozias ozone paauw pablo pacay paced pacer pacht padda paddy padge padle padre padus paean paeon pagan pager pagus pahmi paint paisa palar palas palau palay palch palea paled paler pales palet palla palli pallu pally palma palmo palmy palpi palsy palta palus pamir panak panax panda pandy paned panel pangi panic panna panne panos panse pansy panto pants panty paola paolo papal papaw paper papey papio pappi pappy papyr paque parah param parao parch pardo parel paren parer parge pargo paris parka parky parle parly parma parol parra parry parse parsi parto party parus pasan pasch pasha pashm pasmo passe passo paste pasty pasul patao patas patch patel paten pater pathy patio patly patsy patta patte pattu patty paula pause pauxi pavan paver pavia pavid pavis pawer pawky payed payee payer payni payor peace peach peage peaky pearl peart peasy peaty peavy peban pecan pecht pecky pecos pedal pedee pedes pedro pedum peele peeoy peepy peery peeve peggy peine peise pekan pekin pekoe pelew pelon pelta penal pence penda pengo penis penna penni penny pensy penta peony peppy perca perch percy perdu peres peril perit perky perla perle perry perse perty perun pesah pesky peste petal peter petit petre petty peuhl pewee pewit pfund phaca phaet phage phano phare phase phasm pheal phebe phene pheny pheon phial phill phoby phoca phoma phone phono phony phora phose photo phyla phyle phyma physa piaba piano piast picae pical picea pichi picky picot picra picul picus pidan piece piend piete piety piezo piggy pigly pigmy piked pikel piker pikey pikle pilar pilau pilch pilea piled piler piles pilin pilmy pilon pilot pilum pilus piman pinal pinax pinch pinda pindy pined piner piney pinic pinky pinna pinny pinon pinta pinte pinto pinus pinyl piotr pious pioxe pipal piped piper pipet pipil pipit pippy pipra pique pirny pirol pisan pisay pisco pishu pisky pisum pitau pitch pithy pitta piuri pivot pixie pizza place plack plaga plage plaid plain plait plane plang plank plant plash plasm plass plate platt platy plaud playa plaza plead pleat plebe plebs pleck pleny pleon plica plied plier plies pliny ploat ploce plock plomb plook plote plouk plout pluck pluff pluma plumb plume plump plumy plunk plush pluto plyer poach pobby poche pocky podal poddy podex podge podgy poesy pogge poggy pohna poilu poind point poise pokan poked poker pokey pokom polab polar poler poley polio polis polka polly polos polyp pomak pombe pombo pomey pomme pommy pompa ponca ponce pondo pondy poney ponga pongo ponja ponto pooch pooka pooli pooly popal poppa poppy poral porch pored porer porge porgy poria porky poros porry porta porto porty porus posca poser posey posit posse potch poter potoo potto potty pouce pouch poulp poult pound pouty power poyou praam prana prank prase prate pratt prawn praya preen press prest prexy price prich prick pride pridy pried prier prill prima prime primp primy prine prink print prion prior prism priss prius privy prize proal probe proem proke prone prong proof props prore prose proso pross prosy prote proto prove prowl proxy prude prudy prune prunt pryer pryse psalm pshav pshaw psoas psora psych pubal pubes pubic pubis pucka puddy pudge pudgy pudic pudsy puffy puggi puggy pugil puist puker pukka puler pulex pulka pulli pulpy pulse punan punch punct punga pungi punic punky punta punti punto punty pupal pupil puppy purdy pured puree purer purga purge purre purry purse pursy pussy putid putty pyche pygal pygmy pylar pylic pylon pyoid pyral pyran pyrex pyrus pyxie pyxis quack quadi quaff quail quake quaky quale qualm quant quare quark quarl quart quash quasi quata quauk quave quawk qubba queak queal quean queen queer queet quegh quell queme querl quern query quest queue quica quick quiet quiff quila quill quilt quina quink quint quipo quipu quira quire quirk quirl quirt quite quits quitu quoin quoit quota quote quoth qurti raash rabat rabbi rabic rabid rabin racer rache racon radar radek radii radio radix radon raffe rafik rafty rager raggy raghu rahul raiae rainy raise rajah rajiv rakan raker rakit rally ralph ramal raman rambo ramed ramet ramex ramie rammy ramon ramus ranal rance ranch randy range rangy ranid ranny ranty raper raphe rapic rapid rappe rasen raser raspy rasse ratal ratch rated ratel rater rathe ratio ratti ratty ratwa rauli raupo ravel raven raver ravin rayan rayed rayon razee razer razoo razor reaal reach react readd ready realm reamy rearm reask reasy reave rebab rebag reban rebar rebec rebed rebeg rebel rebia rebid rebob rebop rebox rebud rebus rebut rebuy recap recce recco reccy recon recta recti recto recur recut redan reddy redia redid redig redip redly redox redry redub redue redux redye reedy reefy reeky reese reesk reest reeve refan refel refer refit refix refly regal reges reget regga regia regin regle regma regur rehoe reify reign reina reins relap relax relay relet relic relot reman remap remex remit remix remop remus renal reneg renes renet renew renin renky renne reoil reown repay repeg repel repen repew repic repin reply repot reree rerig rerob rerow rerub rerun resaw resay resee reset resew resex resin resow resty resue resun resup retag retan retax retch retem rethe retia retie retin retip retry reuel reune reuse revel rever revet revie revue rewax rewed rewet rewin rexen rhamn rheae rheen rheic rhein rhema rheme rheum rhina rhine rhino rhoda rhoeo rhomb rhumb rhyme rhymy riant riata ribat ribby ribes ricer ricey richt ricin ricky riden rider ridge ridgy riffi rifle rifty rigel right rigid rigol rigor riley rilly rimal rimer rimpi rinch rinde rindy ringe ringy rinka rinse ripal ripen riper ripup risen riser rishi risky ritzy rival rivel riven river rivet riyal roach roast rober robin roble robot robur rocky rocta rodeo rodge rogan roger rogue rohan rohob rohun roily roist rokee roker rokey roleo rolfe rollo romal roman romeo romic rompu rompy ronco ronde rondo ronga ronni roofy rooky roomy roosa roost rooty roove roper ropes roque roral roric rorty rosal rosed rosel roset rosin rotal rotan rotch roter rotge rotor rotse rouge rough rougy rouky round roupy rouse roust route routh rover rovet rowan rowdy rowed rowel rowen rower rowet rowty roxie royal royet rozum ruach ruana rubia ruble rubor rubus ruche rucky rudas ruddy rudge rufus rugby ruggy ruing ruler rumal ruman rumbo rumen rumex rumly rummy rumor runby runch rundi runed runer runic runny runty rupee rupia rupie rural rushy rusin rusky rusma rusot rusty rutch rutic rutin rutty rutyl ruvid rybat ryder sabal saban saber sabia sabik sabir sable sably sabot sabra sabzi sacae sacra sacro sadhe sadhu sadic sadie sadly safar safen sagai saggy sagra sagum sahib sahme saidi saify saiga saiid saily saimy saint saiph sairy saite saiva sajou sakai sakel saker sakha salad salal salar salat salay salep salic salix salle sally salma salmo salol salon salpa salse salta salty salva salve salvo salvy samaj samal saman samas samba sambo samel samen samir sammy sampi sanai sanct sancy sandy sanga sansi santa santo sapan sapek sapid sapin saple sapor sappy saqib saraf sarah saran sargo sarif sarip sarna sarod saron saros sarpo sarra sarsa sarsi saruk sarus sasan sasin sassy satan satin satyr sauce saucy saugh sauld sault sauna saura saury saute sauty sauve saved saver savin savor savoy savvy sawah sawan sawed sawer saxon sayal sayer sayid sazen scads scaff scala scald scale scall scalp scalt scaly scamp scant scape scare scarf scarn scarp scart scary scase scaul scaum scaup scaur scaut scawd scawl sceat scena scend scene scent schuh schwa scian scind scion sciot sclav sclaw scler sclim scoad scobs scoff scoke scolb scold scone scoon scoop scoot scopa scope scops score scorn scote scots scott scouk scoup scour scout scove scovy scowl scrab scrae scrag scram scran scrap scrat scraw scray scree screw scrim scrin scrip scrob scrod scrog scroo scrow scrub scruf scrum scudi scudo scuff scuft scull sculp scurf scuse scuta scute scyld scyth seamy seary seave seavy sebum secos secre sedan sedat seder sedge sedgy sedum seech seedy seege seely seenu seepy segol segue sehyo seine seise seism seity seize sekar seker sekos selah sella selli selly selva semen semic semis senam sence senci senna sensa sense senso sepad sepal sepia sepic sepoy septa septi sequa serab serai seral serau seraw sereh serer seres serge seric serif serin serio sermo seron serow serra serry serta serum serut serve servo sesia sesma sesti setae setal seton setup seugh seven sever sewan sewed sewen sewer sexed sexly sexto sfoot shack shade shady shaft shahi shaka shake shako shaku shaky shale shall shalt shaly shama shame shane shang shank shant shape shaps shapy shard share shari shark sharn sharp shaul shaup shave shawl shawm shawn shawy sheaf sheal shean shear sheat sheen sheep sheer sheet sheik shela sheld shelf shell shemu shend sheng sheol sheth sheva shewa shiah shice shide shied shiel shier shies shift shiko shilf shilh shill shina shine shiny shire shirk shirl shirr shirt shish shisn shita shive shivy shluh shoad shoal shoat shock shode shoer shogi shoji shojo shola shole shona shone shood shooi shook shool shoop shoor shoot shore shorn short shote shott shout shove shown showy shoya shrab shraf shrag shram shrap shred shree shrew shrip shrog shrub shrug shuba shuck shuff shune shunt shure shurf shush shyam shyer shyly sibby sibyl sicca sicel sided sider sides sidhe sidle sidth siege siena sieva sieve sievy sifac sight sigil sigla sigma sikar siket silas silen silex silky silly silty silva silyl simal simar simia simon sinae sinal since sinew singe singh sinic sinky sinto sintu sinus sioux siper sipid siren sirih siris sirki sirky siroc sirup sisal sisel sissu sissy sitao sitar sitch sithe sitio sitka sitta situs siusi sivan siver siwan sixer sixte sixth sixty sizal sizar sized sizer sizes sjaak skaff skair skart skate skean skeed skeeg skeel skeen skeer skeet skeif skein skelf skell skelp skemp skene skere skete skewl skewy skice skidi skied skier skies skiff skift skill skime skimp skink skirl skirp skirr skirt skite skive skoal skout skulk skull skulp skunk skuse skyey skyre slack slade slain slait slake slaky slamp slane slang slank slant slape slare slart slash slate slath slaty slaum slave slavi sleck sleek sleep sleer sleet slent slept slete slice slich slick slide slime slimy sline sling slink slipe slirt slish slite slive sloan slock sloka sloke slone slonk sloom sloop slope slops slopy slorp slosh slote sloth slour slows sloyd sluer sluig sluit slump slung slunk slurp slush slyly slype smack smaik small smalm smalt smarm smart smash smaze smear smeek smeer smell smelt smeth smich smile smily smirk smite smith smock smoke smoky smolt smook smoos smoot smore smote smous smout smurr smuse smush smyth snack snaff snafu snail snake snaky snape snaps snapy snare snark snarl snary snath snead sneak sneap sneck sneer snell snerp snick snide sniff snift snipe snipy snirl snirt snite snivy snock snoek snoga snoke snood snook snoop snoot snore snork snort snout snowk snowl snowy snuck snuff snurl snurp snurt soaky soapy soary sobby sober socht socii socky socle soddy sodic sodio sodom sofar sofia softa softy soger soget soggy soily soken solan solar solay soldi soldo solea solen soler soles solid solio solod solon solum solve somal somma sonar songo songy sonic sonja sonly sonny sonsy sooke sooky soord sooth sooty sophy sopor soppy soral sorda soree sorex sorgo sorra sorry sorty sorus sorva sosia soter sotho sotie sotik sotol sough souly sound soupy soury souse south sowan sowar sowel sower sowle sowse sowte soyot sozin space spack spacy spade spaer spahi spaid spaik spald spale spall spalt spane spang spank spann spare spark sparm spart spary spasm spass spate spave spawn speak speal spean spear spece speck specs speed speel speen speer spelk spell spelt spend spent speos sperm spewy sphex spica spice spick spicy spied spiel spier spiff spike spiky spile spill spilt spina spine spink spiny spire spiro spirt spiry spise spite spitz splat splay splet split spock spode spoil spoke spoky spole spong spoof spook spool spoom spoon spoor spoot spore sport sposh spout sprad sprag sprat spray spree spret sprew sprig sprit sprod sprue sprug spuke spume spumy spung spunk spurl spurn spurt sputa spyer squab squad squam squat squaw squib squid squin squit sruti staab stack stacy stade staff stage stagy staia staid stain staio stair stake stale stalk stall stamp stand stane stang stank stare stark starn start stary stash state stauk staun staup stave stawn stays stchi stead steak steal steam stean stech steed steek steel steen steep steer steid stein stela stele stell stema stend steng steno stent stept stere steri sterk stern stero stert steve stewy stich stick stife stiff stile still stilt stime stimy stine sting stink stint stion stipa stipe stirk stirp stite stith stive stivy stoat stock stoep stoff stoga stogy stoic stoke stola stole stoma stomp stond stone stong stony stood stoof stook stool stoon stoop stoot stopa stope store stork storm story stosh stoss stoun stoup stour stout stove strad strae strag stram strap straw stray stree stret strew strey stria strid strig strip strit strix strom strop strow stroy strub strue strum strut struv stubb stuck stude study stuff stull stulm stump stung stunk stunt stupa stupe stupp sturk sturt stuss styan styca style stylo suade suant suave subah suber subra succi sucre sudan suddy sudic sudra sudsy suede suety sueve suevi sugan sugar sugih suina suine suing suint suist suite suity sukey sulea sulfa sulka sulky sulla sully sumac sumak sumph sunil sunna sunni sunny sunup suomi supai super surah sural surat sures surfy surge surgy surly surma surra surya susan susie sutor sutra suyog suzan swack swage swain swale swami swamp swamy swang swank swape sward sware swarf swarm swart swash swath swati swazi sweal swear sweat swede sweep sweer sweet swego swell swelp swelt swept swerd swick swift swile swill swimy swine swing swink swipe swipy swird swire swirl swish swiss swith swoon swoop sword swore sworn swosh swung swure sybil sycee sycon sylid sylph sylva synch synod syrma syrup tabby tabes tabet tabic tabid tabla table tabog taboo tabor tabut tacca tache tacit tacky tacso taffy tafia tagal taggy tagua tahil tahin tahua taich taiga taily taino taint taipi taipo tairn taise tajik takao takar taken taker takin takyr talak talao talar taled taler tales talis talky tally talma talon talpa taluk talus tamas tambo tamer tamil tamis tammy tamul tamus tanak tanan tandy tanga tangi tango tangs tangy tanha tania tanka tanoa tansy tanti tanya tanzy tapas tapen taper tapet tapia tapir tapis tapoa tappa tapul taqua taraf tarai tarau tardy tarea tareq tarfa targe tarie tarin tarmi taroc tarok tarot tarri tarry tarse tarsi tarve tasco tasse taste tasty tatar tater tates tatie tatou tatta tatty taube taula tauli taunt taupe taupo tauri taver tawer tawgi tawie tawny tawpi tawse taxed taxer taxis taxon taxor taxus tayer tayir tayra tazia tcawi tchai tchwi teach teaer teaey teart teary tease teasy teaty teave teaze tebet techy tecla tecon tecum teddy tedge teems teens teeny teest teeth teety tegua teian teind tejon tekke tekya telar telei telic tellt telyn teman tembe tembu temin temne tempe tempi tempo tempt temse tenai tench tenet tengu tenio tenne tenon tenor tense tenth tenty tepal tepee tepid tepor terap teras terek tereu terma terna terne terri terry terse terzo testa teste testy tetch tetel teton tetra tetum tewel tewer tewit tewly texan texas thack thais thana thane thank tharf tharm thatn thats thave thawn thawy theah theat theca theek theer theet theft thegn their thema theme theow there therm these theta thewy thick thief thigh thilk thill thine thing think thiol third thirl thirt thisn thoft thoke thole tholi thone thong thoom thore thorn thoro thorp thort those thowt thram thrap thraw thrax three threw thrip throb throe throu throw thrum thruv thuan thuja thule thulr thumb thump thung thuoc thurl thurm thurt thyme thymy tiang tiara tibbu tibby tibet tibey tibia tical ticca ticer ticky ticul tidal tiddy tided tiffy tiger tight tigre tigua tikka tikor tikur tilda tilde tiled tiler tilia tilly tilth tilty timar timbe timbo timed timer times timid timne timon timor tinct tinea tined tinge tingi tinne tinni tinny tinta tinty tiple tippy tipsy tipup tired tirer tirma tirve tisar titan titar titer tithe title titre titty titus tiver tiwaz tizzy tlaco tmema toady toast today toddy todea todus toffy togue toher toise toity tokay token tolan toldo tolly tolyl toman tomas tombe tomin tommy tonal toned toner tonga tongs tonic tonna tonto tonus toona toosh tooth topaz topee toper topia topic toppy topsl topsy toque torah toral toran torch tored toric torii torma torse torsk torso torta torus torve toshy tossy total totem toter totty totum touch tough tould tourn touse tousy tovah tovar towai towan towel tower towny toxic toxin toxon toyer toyon tozee tozer trace track tract tracy trade trady tragi traik trail train trait trama trame tramp trank trant trapa traps trash trass trasy trave trawl tread treat treed treen treey trema trend trent tress trest trews triad trial trias tribe trica trice trick tried trier trifa trike trill trine trink trior tripe tripy trist trite trixy troad troat troca trock troco trode troft trogs troic troke troll tromp trona tronc trone troop troot trope troth trout trove trubu truce truck trudy truer truff trull truly trump trunk trush truss trust truth tryma trypa tryst tsere tsine tsuba tsubo tsuga tsuma tuarn tuart tuath tubae tubal tubar tubba tubby tuber tubig tubik tucky tucum tudel tudor tufan tufty tugui tuism tukra tulip tulle tulsi tumid tummy tumor tunca tuned tuner tunga tungo tunic tunna tunny tupek tupik tuque turbo turco turfy turgy turio turki turma turns turps turse turus tusky tutee tutin tutly tutor tutti tutty tuzla twain twale twalt twana twang twank twant tweag tweak tweed tweeg tweel tween tweet tweil twere twerp twice twick twill twilt twine twink twiny twire twirk twirl twist twite twixt tyche tydie tyigh tying tyken tyler tylus typal typer typha typic tyste tzaam uaupe uayeb uchee uckia udasi udder udell udish ugric uhlan uhllo uigur uinal uinta ukase ulcer ulema uller ulmic ulmin ulmus ulnad ulnae ulnar uloid ultra uluhi ululu ulvan umaua umbel umber umble umbra umiak umiri umpty unact unadd unami unamo unapt unark unarm unary unbag unbar unbay unbed unbet unbid unbit unbog unbow unbox unboy unbud uncap uncia uncle uncoy uncus uncut undam unden under undid undig undim undog undon undry undub undue undug undye uneye unfar unfed unfew unfit unfix unfur ungag unget ungka ungod ungot ungum unhad unhap unhat unhex unhid unhit unhot uniat unice unify uninn union unite unity unjam unked unken unket unkey unkid unkin unlap unlaw unlay unled unlet unlid unlie unlit unmad unman unmet unmew unmix unnew unode unoil unold unona unorn unown unpeg unpen unpin unpot unput unram unray unred unrid unrig unrip unrow unrra unrun unsad unsay unsee unset unsew unsex unshy unsin unsly unson unsty unsun untap untar untax untie until untin untop unurn unuse unwan unwax unweb unwed unwet unwig unwon unzen uparm upbar upbay upbid upbuy upcry upcut updry upeat upend upfly upget upher upjet uplay upleg upmix upper uppop uprid uprip uprun upset upsey upsit upsun upsup uptie upupa upwax upway urali urare urari urase urate urban urbic urdee ureal uredo ureic ureid urena urent urger uriah urial urian uriel urine urite urlar urled urman urnae urnal ursal ursid urson ursuk ursus urubu urucu usage usara usent ushak usher uskok usnea usnic usque uster usual usure usurp usury utchy utees uteri utick utile utrum utsuk utter uvate uveal uviol uvito uvrou uvula uvver uzara uzbak uzbeg uzbek vache vacoa vadim vagal vagas vague vagus vaire vairy vajra vakia vakil valet valid valmy valor valsa valse value valva valve valyl vance vanda vaned vanir vapid vapor varan varda vardy varec varix varna varus varve vasal vasty vatic vaudy vault vaunt vealy vedda vedic vedro veery veily veiny vejoz velal velar veldt velic velte velum venal vened venie venin venom venue venus vepse verby verek verge vergi verpa verre verse verso verst verve vespa vesta vetch veuve vexed vexer vexil viand vibex vibix vicar vicia vicki vicky video vidry vidua vidya viewy vifda vigia vigil vigor vijao vijay villa ville vimen vinal vince vinea vined viner vinic vinny vinod vinta vinyl viola viper viral vireo virga virgo virid viron virtu virus visie visit visne vison visor vista visto vital vitis vitta viuva vivax vivek viver vives vivid vixen vlach vocal vodka vogue vogul voice voile volar volet volta volva vomer vomit votal voter vouch vouge vouli vowed vowel vower vraic vuggy vulva vying waapa waasi wabby wacke wacky waddy wader wadna wafer wafty waged wager wages waggy wagon wahoo waily waird waise waist waive wakan waken waker wakes wakhi wakif wakon waled waler wally walsh walth waltz wamel wamus wandy waned wanga wanle wanly wanny wanty wappo warch warly warnt warri warse warst warth warty warua warve wasat wasco wasel washo washy wasir wasnt waspy waste wasty watap watch water wauch waugh wauns waura wauve waved waver wavey wawah waxen waxer wayao wayne wazir weaky weald weary weave webby weber wecht wedge wedgy weeda weedy weeny weeps weepy weesh weeze wefty weigh weird weism wekau welly welsh wench wende wendi wendy wenny weste westy wetly wevet wezen whack whale whalm whalp whaly whame whamp whand whang whank whare wharf wharl wharp whart whase whata whats whauk whaup whaur wheal wheam wheat wheel wheem wheen wheep wheer wheft whein wheki whelk whelm whelp where whewl whewt whiba which whick whiff whift while whilk whill whils whine whing whiny whipt whirl whish whisk whisp whist white whits whity whole whone whoof whoop whore whorl whort whose whuff whulk whush whute wicht wicky widdy widen widow width wield wifie wigan wiggy wight wilga willy wince winch windy wined winer wingy winly winna winze wiper wired wirer wiros wirra wisen wiser wisha wisht wispy wisse wiste witan witch withe withy witty wiver wiyat wiyot wizen wloka woady woald wodge wodgy woibe wokas woldy wolof wolve woman womby wonga wonky wonna woody wooer woofy woold woons woosh wootz woozy wordy works worky world wormy worry worse worst worth wouch wough would wound woven wrack wramp wrang wrath wrawl wreak wreat wreck wrest wrick wride wried wrier wring wrist write writh wrive wroke wrong wrote wroth wrung wryly wudge wunna wuzzy wyson wyver xebec xenia xenon xenos xenyl xeres xeric xerus xicak xinca xoana xurel xylan xylem xylia xylic xylol xylon xylyl xyrid xyris xysti yabbi yabby yacal yacca yacht yagua yahan yahoo yaird yajna yakan yakin yakka yakut yalla yamel yamen yameo yampa yamph yanan yanky yaply yapok yappy yaqui yarak yaray yarke yarly yarth yasht yasna yauld yawny yazoo yeara yeard yearn yeast yemen yerba yerga yerth yesso yesty yeuky yeven yezdi yezzy ygapo yield yince yinst yirth yocco yodel yogin yoick yojan yokel yoker yolky yomer yomud youff young yourn yours youse youth youve youze yoven yowie yquem yucca yuchi yucky yulan yuman yummy yunca yurak yurok yurta yuruk zabra zabti zaman zambo zamia zande zante zanze zapas zapus zaque zayat zayin zebra zebub zeism zeist zemmi zemni zerda zerma zesty zhmud ziara zibet ziega ziffs zihar zilla zimbi zimme zimmi zinco zippy zirai zirak zizia zloty zmudz zocco zoeal zogan zohak zoism zoist zokor zolle zombi zonal zonar zoned zonic zonta zooid zooks zoons zoque zoril zorro zosma zowie zudda zygal zygon zymic zymin italy spain wales kenya ghana samoa libya syria korea doxie foxie towie mafia zincy zinky nerdy retro campy ditzy busty`.split(' ').filter(w => w.length === 5);
+const VALID = new Set(WORDS.map(w => w.toUpperCase()));
+const POOL  = [...VALID];
 
-// ── PLURALS & EXTRA WORDS ──────────────────────────────
-// Common plurals and words not in base list
-const EXTRA_WORDS = 'AEONS ATOMS BACKS BALLS BANDS BANKS BARDS BARNS BARS BATHS BEADS BEANS BEARS BEATS BELLS BELTS BIRDS BITES BLOBS BLOTS BOATS BOLTS BONDS BONES BOOKS BOOTS BOXES BOYS BREWS BROWS BUDS BUGS BUMPS BURNS BURPS BUSES CABS CADS CALLS CAMPS CAPS CARDS CARES CAVES CELLS CHAPS CHARS CHIPS CHOPS CLAPS CLIPS CLOGS CLUBS CLUES COATS CODES COGS COILS COINS COMBS CONES COOKS CORES COSTS COUGHS COUPS COVES COWS CRABS CREWS CRIBS CROPS CROWS CUBS CUPS CURBS CURDS CURES DABS DADS DALES DAMS DARES DARTS DATES DAWNS DAYS DEALS DEANS DEBTS DECKS DEEDS DENTS DESKS DIALS DIBS DIMS DIPS DIRTS DISCS DITTOS DIVES DOCKS DOGS DOLES DOLLS DOMES DOORS DOSES DOTS DOVES DOWNS DRAGS DRIPS DROPS DRUMS DUELS DUETS DUNES DUNES DUSTS EARLS EARNS EAVES EDGES EELS EGOS ELMS EONS EVENS EXAMS FADES FAILS FALLS FARMS FATES FAXES FEATS FEEDS FEELS FERNS FETES FIBS FIGS FILES FILLS FILMS FINDS FIRES FIRS FISTS FIXES FJORDS FLAPS FLAWS FLEAS FLIPS FLOGS FLOWS FLUTES FOALS FOAMS FOBS FOES FOLDS FONTS FOODS FOOTS FOPS FORDS FORKS FORTS FUMES FUNDS FUSSES GABS GALES GAMES GANGS GAPS GASES GATES GAUGES GAWPS GELS GEMS GENES GERMS GIFTS GILLS GIVES GLOBS GLOOMS GLUTS GNATS GOALS GOATS GODS GOLDS GONGS GOODS GORGES GOUGES GOWNS GRABS GRADS GRAMS GRAPES GRIPES GRIPS GRITS GRUBS GRUNTS GUILDS GULLS GULPS GUMPS GUTS GUYS GYMS HACKS HAILS HALES HALTS HAMS HANGS HARKS HARMS HARPS HASPS HATS HAULS HAWKS HEADS HEAPS HEELS HELMS HELPS HEMS HERBS HERDS HINDS HIRES HIVES HOBBS HOBS HODS HOGS HOLES HOLTS HOPS HORNS HOURS HULKS HULLS HUMPS HUSKS HYPES IMPS INNS IRKS JABS JAGS JAMS JARS JAWS JEANS JELLS JIBS JIGS JOTS JOWLS JUMPS JUSTS KALES KEELS KEENS KEEPS KELPS KERBS KINGS KNOBS KNOLLS KNOTS LACES LADS LAKES LAMPS LANDS LAPS LARKS LASHES LASTS LATHS LAWS LAWNS LAYS LEADS LEAPS LEGS LENDS LETS LIDS LIES LIFTS LIKES LIMBS LIMES LIMPS LINES LIPS LISTS LOANS LOBES LOCKS LODES LOFTS LOGS LOPS LOSES LOTS LOVES LUGS LUMPS LURES LURKS MACES MADS MALES MALTS MANS MAPS MARKS MASTS MATES MAZES MEALS MEATS MEETS MELTS MENDS MILLS MIMES MINDS MINES MISTS MOBS MODES MOLDS MOLES MONKS MOPS MOPS MOSSES MOTES MOUES MUCKS MUDS MULLS MUMPS MURKS MUSES MUSKS NABS NAGS NAILS NAMES NAPS NAVES NINES NIPS NOBS NODS NOOKS NORMS NOTCH NOOKS NUBS NUMBS OAFS OAKS OARS OATS ODDS OILS OMENS OOHS OOPS ORBS ORES OUTS OYES PACES PADS PAGES PAILS PAINS PAIRS PALMS PANS PATS PATHS PAVES PAWNS PEAKS PEATS PECS PEELS PEGS PELTS PENS PETS PIGS PILES PILLS PINES PINGS PINTS PIPES PITS PLANS PLOPS POKES POLES POLLS POOLS PORES POTS POUCH POUFS PRODS PROPS PROWS PUCKS PUFFS PUNS PUPS PURRS QUEENS QUEUES QUILTS QUIPS RACKS RAGS RAIDS RAILS RAINS RAKES RAMPS RAPS REAPS REEDS REELS REINS RENDS RENTS RESTS RIBS RIDS RIGS RIMS RINGS RIOTS RIPS RISKS ROBS RODS ROLES ROLLS ROOFS ROOKS ROOMS ROPES RUTS SACKS SAGS SAILS SAKES SALES SALTS SANDS SAPS SAVES SCABS SCADS SCAMS SCANS SCARS SEALS SEAMS SEEDS SEEMS SEEPS SENDS SHADS SHAFTS SHAGS SHAMS SHEDS SHINS SHIPS SIDES SIGHS SILLS SIMS SINGS SINKS SIRES SIZES SKIDS SKIMS SLABS SLAPS SLATS SLAVS SLEDS SLEWS SLIMS SLIPS SLOBS SLOTS SLUGS SLUMS SNAGS SNAPS SNOBS SNOGS SNUBS SNUGS SOAKS SOAPS SOARS SOBS SODS SOLS SOPS SOULS SOUPS SOURS SPANS SPARS SPATS SPECS SPINS SPITS SPOTS SPUDS SPURS STABS STAGS STEMS STEPS STIRS STUBS STUDS SUBS SUES SUMS SUMO SUPS TABS TAGS TADS TAILS TAMS TANS TAPS TARS TASKS TEES TELLS TEMPS TENDS TERMS TINS TIPS TOADS TODS TOES TOLLS TONES TONGS TOOLS TORQUES TRAMS TRAPS TREKS TRIES TRIMS TRIPS TUBS TUCKS TUGS TUMORS TUNS TUNAS TURDS TWIGS TYPES UDES VANS VARS VATS VEINS VENTS VOIDS VOLES VOTES WADS WAIFS WAILS WANES WARDS WARS WARTS WASPS WAVES WEDS WEEDS WENDS WHIMS WIGS WINDS WINGS WIRES WOES WOOS WORDS WORKS WORMS WRAPS YANKS YARDS YELLS YEWS ZAPS ZONES ZOOMS'.split(' ');
-EXTRA_WORDS.forEach(w => WORDS.add(w));
-
-
-// ── DAILY ──────────────────────────────────────────────
-const DAILY = 'crane stare arose audio raise trace least store later irate snare tears rates notes tones stern lanes deals leans tales alert saner earns japan world stone slate blaze frost groan heist plumb trove quirk vogue gauzy swamp thief snaky brisk scamp grime crave blunt stomp gruel swift shrug epoch taunt gruff waltz brawn clunk frisk'.split(' ').map(w => w.toUpperCase());
+// ══════════════════════════════════════════
+// DAILY WORD
+// ══════════════════════════════════════════
+const DAILY = `arose crane stare audio raise trace least store later irate snare tears notes tones stern lanes deals slate japan world stone crane audio arose stare irate least notes tears rates arose slate crane audio stare irate arose notes stone least rates tears arose slate crane stare irate least audio arose notes stone rates tears arose slate stone audio crane stare irate least notes tears rates arose slate crane stare arose notes stone least rates tears arose slate crane audio stare arose notes stone least rates tears arose slate stone crane audio arose stare irate notes tears rates arose slate crane stare irate least audio arose notes stone rates tears arose slate`.split(' ').filter(w => w.length === 5);
 
 function getDailyWord() {
   const day = Math.floor((Date.now() - new Date('2024-01-01')) / 86400000);
-  return DAILY[day % DAILY.length];
+  return (DAILY.length ? DAILY : POOL)[day % (DAILY.length || POOL.length)].toUpperCase();
 }
 function todayStr() {
   return new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
 }
 
-// ── ENCODE/DECODE ──────────────────────────────────────
-const SK = [0x4B,0x4E,0x55,0x43,0x4B];
+// ══════════════════════════════════════════
+// ENCODE / DECODE
+// ══════════════════════════════════════════
+const CKEY = [0x4B,0x4E,0x55,0x43,0x4B];
 function encodeWord(w) {
-  w = w.toUpperCase();
-  let out = '';
-  for (let i = 0; i < w.length; i++) out += (w.charCodeAt(i) ^ SK[i % SK.length]).toString(16).padStart(2,'0');
+  let o = '';
+  for (let i = 0; i < 5; i++) o += (w.charCodeAt(i) ^ CKEY[i]).toString(16).padStart(2,'0');
   const cs = w.split('').reduce((a,c) => a + c.charCodeAt(0), 0) % 256;
-  return (out + cs.toString(16).padStart(2,'0')).toUpperCase();
+  return (o + cs.toString(16).padStart(2,'0')).toUpperCase();
 }
-function decodeCode(code) {
-  const c = code.trim().toUpperCase().replace(/-/g,'');
+function decodeCode(s) {
+  const c = s.replace(/-/g,'').trim().toUpperCase();
   if (c.length !== 12) return null;
   try {
-    let word = '';
+    let w = '';
     for (let i = 0; i < 5; i++) {
-      const ch = String.fromCharCode(parseInt(c.slice(i*2,i*2+2),16) ^ SK[i % SK.length]);
+      const ch = String.fromCharCode(parseInt(c.slice(i*2,i*2+2),16) ^ CKEY[i]);
       if (!/[A-Z]/.test(ch)) return null;
-      word += ch;
+      w += ch;
     }
-    const cs = word.split('').reduce((a,c) => a + c.charCodeAt(0), 0) % 256;
-    return cs === parseInt(c.slice(10,12),16) ? word : null;
+    const cs = w.split('').reduce((a,c) => a + c.charCodeAt(0), 0) % 256;
+    return cs === parseInt(c.slice(10,12),16) ? w : null;
   } catch(e) { return null; }
 }
 function fmtCode(c) { return c.match(/.{1,4}/g).join('-'); }
 
-// ── SETTINGS ──────────────────────────────────────────
-let cfg = JSON.parse(localStorage.getItem('kn_cfg') || 'null') || {hard:false,free:false,sound:true,cb:false,hc:false,theme:'dark'};
-function saveCfg() { localStorage.setItem('kn_cfg', JSON.stringify(cfg)); }
-function syncTog(id, v) { const t = document.getElementById(id); if(t) t.classList.toggle('on', !!v); }
-
-function applyTheme(t) {
-  cfg.theme = t;
-  document.documentElement.dataset.theme = t;
-  const btn = document.getElementById('btn-theme');
-  if (btn) { btn.textContent = t === 'dark' ? '☀' : '☽'; btn.classList.toggle('on', t === 'light'); }
-  syncTog('tog-theme', t === 'dark');
-}
-function applyCb(v) {
-  cfg.cb = v;
-  document.documentElement.dataset.cb = String(v);
-  document.getElementById('btn-cb')?.classList.toggle('on', v);
-  syncTog('tog-cb', v);
-}
-function applyHc(v) {
-  cfg.hc = v;
-  document.documentElement.dataset.hc = String(v);
-  document.getElementById('btn-hc')?.classList.toggle('on', v);
-  syncTog('tog-hc', v);
-}
-function applyHard(v) {
-  cfg.hard = v;
-  document.getElementById('hard-ind')?.classList.toggle('on', v);
-  syncTog('tog-hard', v);
-}
-function initCfg() {
-  applyTheme(cfg.theme);
-  applyCb(cfg.cb);
-  applyHc(cfg.hc);
-  applyHard(cfg.hard);
-  syncTog('tog-sound', cfg.sound);
-  syncTog('tog-free', cfg.free||false);
-}
-
-// Header buttons
-document.getElementById('btn-theme').addEventListener('click', () => { applyTheme(cfg.theme==='dark'?'light':'dark'); saveCfg(); });
-document.getElementById('btn-cb').addEventListener('click', () => { applyCb(!cfg.cb); saveCfg(); });
-document.getElementById('btn-hc').addEventListener('click', () => { applyHc(!cfg.hc); saveCfg(); });
-
-function wireTog(id, fn) {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('click', function() { fn(!this.classList.contains('on')); saveCfg(); });
-}
-wireTog('tog-hard', v => {
-  if (G.row > 0 && !G.over) { toast('Finish current game first', 1800, 'err'); return; }
-  applyHard(v);
-  toast(v ? 'Hard mode on — use revealed letters!' : 'Hard mode off', 1800);
-});
-wireTog('tog-free', v => {
-  cfg.free = v;
-  syncTog('tog-free', v);
-  document.getElementById('hard-ind').title = v ? 'Free mode' : '';
-  toast(v ? 'Free mode on — any letters accepted!' : 'Free mode off', 1800);
-});
-wireTog('tog-sound', v => { cfg.sound = v; syncTog('tog-sound', v); });
-wireTog('tog-cb',    v => { applyCb(v); });
-wireTog('tog-hc',    v => { applyHc(v); });
-wireTog('tog-theme', v => { applyTheme(v ? 'dark' : 'light'); });
-
-// ── SOUND ──────────────────────────────────────────────
+// ══════════════════════════════════════════
+// SOUND
+// ══════════════════════════════════════════
 let actx = null;
-function ac() { if (!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); return actx; }
-function tone(freq, type, dur, vol, delay) {
+function tone(freq, type, dur, vol, delay=0) {
   if (!cfg.sound) return;
   try {
-    const a = ac(), o = a.createOscillator(), g = a.createGain();
-    o.connect(g); g.connect(a.destination);
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.connect(g); g.connect(actx.destination);
     o.type = type; o.frequency.value = freq;
-    g.gain.setValueAtTime(0, a.currentTime + delay);
-    g.gain.linearRampToValueAtTime(vol, a.currentTime + delay + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + delay + dur);
-    o.start(a.currentTime + delay);
-    o.stop(a.currentTime + delay + dur + 0.05);
+    const t = actx.currentTime + delay;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.start(t); o.stop(t + dur + 0.05);
   } catch(e) {}
 }
 const sfx = {
-  type:   () => tone(600,'sine',0.04,0.08,0),
-  del:    () => tone(300,'sine',0.05,0.06,0),
-  inv:    () => { tone(180,'sawtooth',0.12,0.1,0); tone(150,'sawtooth',0.12,0.08,0.08); },
-  hard:   () => { tone(250,'square',0.15,0.1,0); tone(200,'square',0.1,0.08,0.1); },
-  rev:    (st,i) => { const f={correct:520,present:420,absent:280}; tone(f[st]||300,'sine',0.12,0.12,i*0.06); },
-  win:    () => [523,659,784,1047].forEach((f,i) => tone(f,'sine',0.3,0.15,i*0.12)),
-  lose:   () => { tone(220,'sawtooth',0.4,0.12,0); tone(180,'sawtooth',0.4,0.1,0.15); },
+  type:    () => tone(600,'sine',0.04,0.08),
+  del:     () => tone(300,'sine',0.05,0.06),
+  invalid: () => { tone(180,'sawtooth',0.12,0.1); tone(150,'sawtooth',0.12,0.08,0.08); },
+  hard:    () => { tone(250,'square',0.15,0.1); tone(200,'square',0.1,0.08,0.1); },
+  reveal:  (st,i) => tone({correct:520,present:420,absent:280}[st]||300,'sine',0.12,0.12,i*0.06),
+  win:     () => [523,659,784,1047].forEach((f,i) => tone(f,'sine',0.3,0.15,i*0.12)),
+  lose:    () => { tone(220,'sawtooth',0.4,0.12); tone(180,'sawtooth',0.4,0.1,0.15); },
 };
 
-// ── PARTICLES ──────────────────────────────────────────
-const cv = document.getElementById('cvs');
-const cx = cv.getContext('2d');
-let pts = [], aid = null;
-function rsz() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
-rsz(); window.addEventListener('resize', rsz);
+// ══════════════════════════════════════════
+// CFG + STATS
+// ══════════════════════════════════════════
+let cfg = JSON.parse(localStorage.getItem('kn_cfg') || 'null') || {
+  hard:false, sound:true, cb:false, hc:false, theme:'dark'
+};
+let stats = JSON.parse(localStorage.getItem('kn_stats') || 'null') || {
+  played:0, wins:0, streak:0, best:0, dist:{1:0,2:0,3:0,4:0,5:0,6:0}
+};
+function saveCfg()   { localStorage.setItem('kn_cfg',   JSON.stringify(cfg));   }
+function saveStats() { localStorage.setItem('kn_stats', JSON.stringify(stats)); }
 
-function spawnPts(x, y, col, n, o) {
-  o = o || {};
-  for (let i = 0; i < n; i++) {
-    const a = (o.ang||0) + (Math.random()-.5) * (o.spr || Math.PI*2);
-    const sp = (o.mn||2) + Math.random() * (o.mx||7);
-    pts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,al:1,sz:(o.sz||3)+Math.random()*(o.szv||5),
-      col,sq:Math.random()>.45,rot:Math.random()*Math.PI*2,rs:(Math.random()-.5)*.35,
-      gv:(o.gv||.2)+Math.random()*.08,dc:(o.dc||.016)+Math.random()*.012});
-  }
-  if (!aid) loop();
+// ══════════════════════════════════════════
+// APPLY SETTINGS
+// ══════════════════════════════════════════
+function setTheme(t)  { cfg.theme=t; document.documentElement.dataset.theme=t; document.getElementById('btn-theme').textContent=t==='dark'?'☀':'☽'; syncTog('tog-theme',t==='dark'); document.getElementById('btn-theme').classList.toggle('on',t==='light'); }
+function setCb(v)     { cfg.cb=v;    document.documentElement.dataset.cb=String(v);  document.getElementById('btn-cb').classList.toggle('on',v); syncTog('tog-cb',v); }
+function setHc(v)     { cfg.hc=v;    document.documentElement.dataset.hc=String(v);  document.getElementById('btn-hc').classList.toggle('on',v); syncTog('tog-hc',v); }
+function setHardUI(v) { document.getElementById('hardpip').classList.toggle('show',v); syncTog('tog-hard',v); }
+function syncTog(id,v){ const t=document.getElementById(id); if(t) t.classList.toggle('on',!!v); }
+
+function applyAll() {
+  setTheme(cfg.theme); setCb(cfg.cb); setHc(cfg.hc); setHardUI(cfg.hard);
+  syncTog('tog-sound', cfg.sound);
 }
-function loop() {
-  cx.clearRect(0,0,cv.width,cv.height);
-  pts = pts.filter(p => p.al > 0.01);
-  for (const p of pts) {
-    p.x+=p.vx; p.y+=p.vy; p.vy+=p.gv; p.vx*=.985; p.al-=p.dc; p.rot+=p.rs;
-    cx.save(); cx.globalAlpha=Math.max(0,p.al); cx.fillStyle=p.col;
-    cx.translate(p.x,p.y); cx.rotate(p.rot);
-    if (p.sq) cx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz*.55);
-    else { cx.beginPath(); cx.arc(0,0,p.sz/2,0,Math.PI*2); cx.fill(); }
-    cx.restore();
-  }
-  if (pts.length) aid = requestAnimationFrame(loop);
-  else { aid=null; cx.clearRect(0,0,cv.width,cv.height); }
+
+// toggle wire
+function wireTog(id, fn) {
+  document.getElementById(id).addEventListener('click', function() {
+    fn(!this.classList.contains('on'));
+    saveCfg();
+  });
 }
-function burst(tile, st) {
-  const r = tile.getBoundingClientRect(), x = r.left+r.width/2, y = r.top+r.height/2;
-  const cs = getComputedStyle(document.documentElement);
-  if (st==='correct') {
-    spawnPts(x,y,cs.getPropertyValue('--cor').trim()||'#4a9e6b',22,{mn:2,mx:8,sz:4,szv:8});
-    spawnPts(x,y,'#a8f0c0',10,{mn:1,mx:5,sz:2,szv:3});
-    spawnPts(x,y,'#fff',5,{mn:3,mx:10});
-  } else if (st==='present') {
-    spawnPts(x,y,cs.getPropertyValue('--pre').trim()||'#c9933a',10,{mn:1,mx:5,sz:3});
-    spawnPts(x,y,'#f0d090',5,{mn:1,mx:4,sz:2});
-  } else {
-    spawnPts(x,y,'#555',4,{mn:1,mx:3,dc:.05});
+
+// ══════════════════════════════════════════
+// GAME STATE
+// ══════════════════════════════════════════
+const MG=6, WL=5;
+let state = { word:'', mode:'daily', row:0, col:0, guess:[], over:false, results:[] };
+let hardCons = [];
+let kState = {};
+
+// ══════════════════════════════════════════
+// PARTICLES
+// ══════════════════════════════════════════
+const cvs = document.getElementById('fx-canvas');
+const ctx = cvs.getContext('2d');
+let parts = [], animId = null;
+function resizeCvs() { cvs.width=window.innerWidth; cvs.height=window.innerHeight; }
+resizeCvs(); window.addEventListener('resize', resizeCvs);
+
+function spawnP(x,y,col,n,o={}) {
+  for (let i=0;i<n;i++) {
+    const a=(o.angle||0)+(Math.random()-.5)*(o.spread||Math.PI*2);
+    const sp=(o.min||2)+Math.random()*(o.max||7);
+    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,alpha:1,
+      size:(o.sz||3)+Math.random()*(o.szv||5),col,
+      shape:Math.random()>.45?'r':'c',rot:Math.random()*Math.PI*2,
+      rs:(Math.random()-.5)*.35,grav:(o.grav||.2)+Math.random()*.08,
+      dec:(o.dec||.016)+Math.random()*.012});
   }
+  if (!animId) loopP();
 }
-function bigBurst(tEls) {
-  tEls.forEach((t,i) => setTimeout(() => {
-    const r=t.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+function loopP() {
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  parts = parts.filter(p=>p.alpha>.01);
+  for (const p of parts) {
+    p.x+=p.vx; p.y+=p.vy; p.vy+=p.grav; p.vx*=.985;
+    p.alpha-=p.dec; p.rot+=p.rs;
+    ctx.save(); ctx.globalAlpha=Math.max(0,p.alpha); ctx.fillStyle=p.col;
+    ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+    if (p.shape==='r') ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*.55);
+    else { ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
+  }
+  if (parts.length) animId=requestAnimationFrame(loopP);
+  else { animId=null; ctx.clearRect(0,0,cvs.width,cvs.height); }
+}
+function burstTile(tile,st) {
+  const r=tile.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
+  const cs=getComputedStyle(document.documentElement);
+  const corr=cs.getPropertyValue('--correct').trim()||'#4a9e6b';
+  const pres=cs.getPropertyValue('--present').trim()||'#c9933a';
+  if (st==='correct')       { spawnP(cx,cy,corr,22,{min:2,max:8,sz:4,szv:8}); spawnP(cx,cy,'#a8f0c0',10); spawnP(cx,cy,'#fff',5,{min:3,max:10}); }
+  else if (st==='present')  { spawnP(cx,cy,pres,10,{min:1,max:5}); spawnP(cx,cy,'#f0d090',5); }
+  else                       { spawnP(cx,cy,'#555',4,{min:1,max:3,dec:.05}); }
+}
+function bigBurst(tileEls) {
+  tileEls.forEach((tile,i) => setTimeout(()=>{
+    const r=tile.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
     const cs=getComputedStyle(document.documentElement);
-    spawnPts(x,y,cs.getPropertyValue('--cor').trim()||'#4a9e6b',45,{mn:3,mx:12,sz:4,szv:8});
-    spawnPts(x,y,'#a8f0c0',25,{mn:2,mx:8,sz:2,szv:4});
-    spawnPts(x,y,'#fff',15,{mn:4,mx:14,sz:2});
-    spawnPts(x,y,'#e63946',10,{mn:2,mx:7,sz:3});
+    const corr=cs.getPropertyValue('--correct').trim()||'#4a9e6b';
+    spawnP(cx,cy,corr,45,{min:3,max:12,sz:4,szv:8});
+    spawnP(cx,cy,'#a8f0c0',25,{min:2,max:8});
+    spawnP(cx,cy,'#fff',15,{min:4,max:14});
+    spawnP(cx,cy,'#e63946',10,{min:2,max:7});
   }, i*110));
 }
-function flash(col, op) {
-  const el = document.createElement('div');
-  Object.assign(el.style, {position:'fixed',inset:0,background:col,opacity:op||.18,pointerEvents:'none',zIndex:60,transition:'opacity .55s ease'});
+function flash(col, op=.18) {
+  const el=document.createElement('div');
+  Object.assign(el.style,{position:'fixed',inset:0,background:col,opacity:op,
+    pointerEvents:'none',zIndex:60,transition:'opacity .55s ease'});
   document.body.appendChild(el);
-  requestAnimationFrame(() => { el.style.opacity=0; setTimeout(()=>el.remove(),700); });
+  requestAnimationFrame(()=>{ el.style.opacity=0; setTimeout(()=>el.remove(),700); });
 }
 
-// ── GAME STATE ─────────────────────────────────────────
-const MG = 6, WL = 5;
-const KBROWS = [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['ENTER','Z','X','C','V','B','N','M','⌫']];
-let G = {word:'',mode:'daily',row:0,col:0,guess:[],over:false,results:[]};
-let stats = JSON.parse(localStorage.getItem('kn_stats')||'null') || {played:0,wins:0,streak:0,best:0,dist:{1:0,2:0,3:0,4:0,5:0,6:0}};
-function saveStats() { localStorage.setItem('kn_stats', JSON.stringify(stats)); }
-let hardC = [];
-let kState = {}, tiles = [], kmap = {};
-
-// ── GRID ───────────────────────────────────────────────
+// ══════════════════════════════════════════
+// GRID
+// ══════════════════════════════════════════
 const gridEl = document.getElementById('grid');
+let tiles = [];
 function buildGrid() {
-  gridEl.innerHTML = ''; tiles = [];
-  for (let r = 0; r < MG; r++) {
-    const row = document.createElement('div'); row.className = 'row';
-    tiles[r] = [];
-    for (let c = 0; c < WL; c++) {
-      const t = document.createElement('div'); t.className = 'tile';
-      t.style.animationDelay = (r*WL+c)*30 + 'ms';
+  gridEl.innerHTML=''; tiles=[];
+  for (let r=0; r<MG; r++) {
+    const row=document.createElement('div'); row.className='row';
+    tiles[r]=[];
+    for (let c=0; c<WL; c++) {
+      const t=document.createElement('div'); t.className='tile';
+      t.style.animationDelay=(r*WL+c)*30+'ms';
       t.classList.add('intro');
-      row.appendChild(t); tiles[r][c] = t;
+      row.appendChild(t); tiles[r][c]=t;
     }
     gridEl.appendChild(row);
   }
-  updRow();
+  refreshActiveRow();
 }
 
-function updRow() {
-  document.querySelectorAll('#grid .row').forEach((row, i) => {
-    row.classList.toggle('ar', i === G.row && !G.over);
-    row.classList.remove('t1','t2');
-    if (i === G.row && !G.over) {
-      if (G.row === MG-1) row.classList.add('t2');
-      else if (G.row === MG-2) row.classList.add('t1');
+function refreshActiveRow() {
+  const rows = gridEl.querySelectorAll('.row');
+  rows.forEach((row,i) => {
+    row.classList.toggle('activerow', i===state.row && !state.over);
+    row.classList.remove('tension1','tension2');
+    if (i===state.row && !state.over) {
+      if (state.row===MG-1) row.classList.add('tension2');
+      else if (state.row===MG-2) row.classList.add('tension1');
     }
   });
-  document.querySelectorAll('.tile').forEach(t => t.classList.remove('atile'));
-  if (!G.over && G.row < MG) {
-    for (let c = 0; c <= G.col && c < WL; c++) {
-      if (tiles[G.row] && tiles[G.row][c]) tiles[G.row][c].classList.add('atile');
+  // active tile highlight
+  if (tiles[state.row]) {
+    tiles.forEach(rowT => rowT.forEach(t => t.classList.remove('activetile')));
+    if (!state.over) {
+      for (let c=0; c<state.col; c++) {
+        if (tiles[state.row][c]) tiles[state.row][c].classList.add('activetile');
+      }
     }
   }
 }
 
-// ── KEYBOARD ───────────────────────────────────────────
-const kbEl = document.getElementById('kb');
-function buildKB() {
-  kbEl.innerHTML = ''; kmap = {};
-  KBROWS.forEach(row => {
-    const r = document.createElement('div'); r.className = 'kr';
+// ══════════════════════════════════════════
+// KEYBOARD
+// ══════════════════════════════════════════
+const KB = [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['ENTER','Z','X','C','V','B','N','M','⌫']];
+const kbEl = document.getElementById('keyboard');
+let keyMap = {};
+function buildKb() {
+  kbEl.innerHTML=''; keyMap={};
+  KB.forEach(row => {
+    const rowEl=document.createElement('div'); rowEl.className='kbrow';
     row.forEach(k => {
-      const b = document.createElement('button');
-      b.className = 'key' + (k.length>1?' w':'');
-      b.textContent = k;
-      b.addEventListener('click', () => handleKey(k));
-      r.appendChild(b); kmap[k] = b;
+      const btn=document.createElement('button');
+      btn.className='key'+(k.length>1?' wide':'');
+      btn.textContent=k;
+      btn.addEventListener('click', ()=>handleKey(k));
+      rowEl.appendChild(btn); keyMap[k]=btn;
     });
-    kbEl.appendChild(r);
+    kbEl.appendChild(rowEl);
   });
 }
 
-// ── TOAST ──────────────────────────────────────────────
-let tTimer;
-function toast(msg, ms, cls) {
-  const t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = msg;
-  t.className = cls ? cls+' on' : 'on';
-  clearTimeout(tTimer);
-  tTimer = setTimeout(() => t.classList.remove('on'), ms||1900);
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+let toastT;
+function toast(msg, ms=1900, cls='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=cls; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),ms);
 }
 
-// ── INPUT ──────────────────────────────────────────────
+// ══════════════════════════════════════════
+// INPUT
+// ══════════════════════════════════════════
 document.addEventListener('keydown', e => {
-  if (document.querySelector('.mo.on')) return;
-  if (G.over) return;
-  if (e.key==='Enter') handleKey('ENTER');
-  else if (e.key==='Backspace') handleKey('⌫');
+  if (document.querySelector('.overlay.open')) return;
+  if (state.over) return;
+  if (e.key==='Enter')             handleKey('ENTER');
+  else if (e.key==='Backspace')    handleKey('⌫');
   else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
 });
 
 function handleKey(k) {
-  if (G.over) return;
-  if (k==='⌫') delLetter();
+  if (state.over) return;
+  if (k==='⌫')    delLetter();
   else if (k==='ENTER') submit();
-  else if (/^[A-Z]$/.test(k) && G.col < WL) addLetter(k);
+  else if (/^[A-Z]$/.test(k) && state.col<WL) addLetter(k);
 }
 function addLetter(l) {
-  G.guess[G.col] = l;
-  const t = tiles[G.row][G.col];
-  t.textContent = l;
-  t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop');
-  G.col++; sfx.type(); updRow();
+  state.guess[state.col]=l;
+  const t=tiles[state.row][state.col];
+  t.textContent=l; t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop');
+  state.col++; sfx.type(); refreshActiveRow();
 }
 function delLetter() {
-  if (!G.col) return;
-  G.col--; G.guess[G.col] = null;
-  tiles[G.row][G.col].textContent = '';
-  tiles[G.row][G.col].classList.remove('pop','atile');
-  sfx.del(); updRow();
+  if (!state.col) return;
+  state.col--; state.guess[state.col]=null;
+  const t=tiles[state.row][state.col];
+  t.textContent=''; t.classList.remove('pop','activetile');
+  sfx.del(); refreshActiveRow();
 }
 
-// ── HARD MODE ──────────────────────────────────────────
+// ══════════════════════════════════════════
+// HARD MODE
+// ══════════════════════════════════════════
 function checkHard(guess) {
   if (!cfg.hard) return null;
-  for (const c of hardC) {
-    if (c.type==='correct' && guess[c.pos]!==c.letter)
-      return (c.pos+1) + ['st','nd','rd'][c.pos]||'th' + ' letter must be ' + c.letter;
-    if (c.type==='present' && !guess.includes(c.letter))
-      return 'Guess must contain ' + c.letter;
+  for (const c of hardCons) {
+    if (c.type==='correct' && guess[c.pos]!==c.letter) return `${c.pos+1}${['st','nd','rd'][c.pos]||'th'} letter must be ${c.letter}`;
+    if (c.type==='present' && !guess.includes(c.letter)) return `Guess must contain ${c.letter}`;
   }
   return null;
 }
 function updateHard(guess, result) {
   if (!cfg.hard) return;
   result.forEach((r,i) => {
-    if (r==='correct' && !hardC.find(c=>c.type==='correct'&&c.pos===i))
-      hardC.push({letter:guess[i],pos:i,type:'correct'});
-    else if (r==='present' && !hardC.find(c=>c.letter===guess[i]&&c.type==='present'))
-      hardC.push({letter:guess[i],pos:i,type:'present'});
+    if (r==='correct' && !hardCons.find(c=>c.type==='correct'&&c.pos===i))
+      hardCons.push({letter:guess[i],pos:i,type:'correct'});
+    if (r==='present' && !hardCons.find(c=>c.letter===guess[i]&&c.type==='present'))
+      hardCons.push({letter:guess[i],type:'present'});
   });
 }
 
-// ── SUBMIT ─────────────────────────────────────────────
+// ══════════════════════════════════════════
+// SUBMIT
+// ══════════════════════════════════════════
 function submit() {
-  if (G.col < WL) { toast('Not enough letters',1600,'err'); invalRow(G.row); sfx.inv(); return; }
-  const guess = G.guess.join('');
-  if (!cfg.free && !WORDS.has(guess)) { toast('"'+guess+'" — not in word list',2000,'err'); invalRow(G.row); sfx.inv(); return; }
-  const he = checkHard(guess);
-  if (he) { toast(he,2200,'herr'); invalRow(G.row); sfx.hard(); return; }
-  const result = evaluate(guess);
-  updateHard(guess, result);
-  G.results.push({guess,result});
-  reveal(G.row, result, guess);
+  if (state.col<WL)          { toast('Not enough letters',1600,'iserr'); shakeRow(state.row); sfx.invalid(); return; }
+  const guess=state.guess.join('');
+  if (!VALID.has(guess))     { toast(guess+' — not in word list',2000,'iserr'); shakeRow(state.row); sfx.invalid(); return; }
+  const herr=checkHard(guess);
+  if (herr)                  { toast(herr,2200,'ishard'); shakeRow(state.row); sfx.hard(); return; }
+  const result=evaluate(guess);
+  updateHard(guess,result);
+  state.results.push({guess,result});
+  revealRow(state.row, result, guess);
 }
-
 function evaluate(guess) {
-  const res = Array(WL).fill('absent');
-  const wa = G.word.split(''), ga = guess.split(''), used = Array(WL).fill(false);
+  const res=Array(WL).fill('absent');
+  const wa=state.word.split(''), ga=guess.split(''), used=Array(WL).fill(false);
   for (let i=0;i<WL;i++) if (ga[i]===wa[i]) { res[i]='correct'; used[i]=true; }
   for (let i=0;i<WL;i++) {
     if (res[i]==='correct') continue;
@@ -637,309 +791,301 @@ function evaluate(guess) {
   }
   return res;
 }
-
-// ── REVEAL ─────────────────────────────────────────────
-function reveal(row, result, guess) {
-  const H=230, S=310;
-  result.forEach((st,i) => {
-    const t = tiles[row][i];
-    setTimeout(() => {
-      t.style.transition = 'transform '+H+'ms cubic-bezier(.4,0,.6,1)';
-      t.style.transform = 'rotateX(-90deg) scaleY(.6)';
-      setTimeout(() => {
-        t.classList.remove('atile');
-        t.classList.add(st,'scan');
-        t.style.transition = 'transform '+H+'ms cubic-bezier(.2,1,.4,1)';
-        t.style.transform = 'rotateX(0deg) scaleY(1)';
-        burst(t, st);
-        updKey(guess[i], st);
-        sfx.rev(st, i);
-        if (st==='correct') setTimeout(()=>t.classList.add('gl'), H);
-      }, H);
-    }, i*S);
+function shakeRow(row) {
+  tiles[row].forEach(t => {
+    t.classList.remove('invalid','shake'); void t.offsetWidth;
+    t.classList.add('invalid');
+    t.addEventListener('animationend', ()=>t.classList.remove('invalid','shake'), {once:true});
   });
+}
+
+// ══════════════════════════════════════════
+// REVEAL
+// ══════════════════════════════════════════
+function revealRow(row, result, guess) {
+  const HALF=230, STAGGER=310;
+  result.forEach((st,i) => {
+    const tile=tiles[row][i];
+    setTimeout(() => {
+      tile.style.transition=`transform ${HALF}ms cubic-bezier(.4,0,.6,1)`;
+      tile.style.transform='rotateX(-90deg) scaleY(.6)';
+      setTimeout(() => {
+        tile.classList.remove('activetile');
+        tile.classList.add(st,'scan');
+        tile.style.transition=`transform ${HALF}ms cubic-bezier(.2,1,.4,1)`;
+        tile.style.transform='rotateX(0deg) scaleY(1)';
+        burstTile(tile,st);
+        setKey(guess[i],st);
+        sfx.reveal(st,i);
+        if (st==='correct') setTimeout(()=>tile.classList.add('glowing'),HALF);
+      }, HALF);
+    }, i*STAGGER);
+  });
+
+  const done=(WL-1)*STAGGER+HALF*2+120;
   setTimeout(() => {
-    const won = result.every(r=>r==='correct');
-    G.row++; G.guess=[]; G.col=0;
+    const won=result.every(r=>r==='correct');
+    state.row++; state.guess=[]; state.col=0;
     if (won) {
-      G.over = true;
-      if (G.mode !== 'challenge') {
+      state.over=true;
+      if (state.mode!=='challenge') {
         stats.played++; stats.wins++; stats.streak++;
-        if (stats.streak > stats.best) stats.best = stats.streak;
-        stats.dist[String(G.row)] = (stats.dist[String(G.row)]||0)+1;
+        if (stats.streak>stats.best) stats.best=stats.streak;
+        stats.dist[String(state.row)]=(stats.dist[String(state.row)]||0)+1;
         saveStats(); updateBar();
       }
-      const msgs=['INSANE!','SAVAGE!','CLEAN!','KNUCKLES UP!','SOLID.','LUCKY...'];
-      tiles[row].forEach((t,i) => setTimeout(()=>t.classList.add('wb'),i*75));
-      setTimeout(() => {
-        bigBurst(tiles[row]); flash('#4a9e6b',.18); sfx.win();
-        toast(msgs[Math.min(G.row-1,5)], 2400);
-        setTimeout(() => showEnd(true), 1900);
+      tiles[row].forEach((t,i)=>setTimeout(()=>t.classList.add('winbounce'),i*75));
+      setTimeout(()=>{
+        bigBurst(tiles[row]); flash('#4a9e6b'); sfx.win();
+        toast(['INSANE!','SAVAGE!','CLEAN!','KNUCKLES UP!','SOLID.','LUCKY...'][Math.min(state.row-1,5)], 2400);
+        setTimeout(()=>showEnd(true), 1900);
       }, 550);
     } else {
-      updRow();
-      if (G.row >= MG) {
-        G.over = true;
-        if (G.mode !== 'challenge') { stats.played++; stats.streak=0; saveStats(); updateBar(); }
-        setTimeout(() => { sfx.lose(); flash('#e63946',.2); dropLose(()=>showEnd(false)); }, 300);
+      refreshActiveRow();
+      if (state.row>=MG) {
+        state.over=true;
+        if (state.mode!=='challenge') { stats.played++; stats.streak=0; saveStats(); updateBar(); }
+        setTimeout(()=>{ sfx.lose(); flash('#e63946',.2); tiles.forEach((rt,ri)=>rt.forEach((t,ci)=>setTimeout(()=>t.classList.add('lossdrop'),ri*60+ci*30))); setTimeout(()=>showEnd(false),900); }, 300);
       }
     }
-  }, (WL-1)*S + H*2 + 120);
+  }, done);
+}
+function setKey(letter, st) {
+  const pri={correct:3,present:2,absent:1};
+  if (!pri[st] || (kState[letter]&&pri[kState[letter]]>=pri[st])) return;
+  kState[letter]=st;
+  const btn=keyMap[letter]; if (!btn) return;
+  btn.classList.remove('correct','present','absent','keylit');
+  btn.classList.add(st); void btn.offsetWidth; btn.classList.add('keylit');
+  btn.addEventListener('animationend',()=>btn.classList.remove('keylit'),{once:true});
 }
 
-function invalRow(row) {
-  tiles[row].forEach(t => {
-    t.classList.remove('inv','shk'); void t.offsetWidth; t.classList.add('inv');
-    t.addEventListener('animationend', ()=>t.classList.remove('inv','shk'), {once:true});
-  });
-}
-function dropLose(cb) {
-  tiles.forEach((row,ri) => row.forEach((t,ci) => setTimeout(()=>t.classList.add('ld'), ri*60+ci*30)));
-  setTimeout(cb, 900);
-}
-
-const kPrio = {correct:3,present:2,absent:1};
-function updKey(letter, st) {
-  if (!kPrio[st] || (kState[letter] && kPrio[kState[letter]] >= kPrio[st])) return;
-  kState[letter] = st;
-  const b = kmap[letter]; if (!b) return;
-  b.classList.remove('correct','present','absent','jr');
-  b.classList.add(st); void b.offsetWidth; b.classList.add('jr');
-  b.addEventListener('animationend', ()=>b.classList.remove('jr'), {once:true});
-}
-
-// ── DEFINITIONS ────────────────────────────────────────
-const DEFS = {
-  JAPAN:'Island nation in East Asia, known for its culture, technology and cuisine.',
-  CRANE:'A large wading bird, or a machine for lifting heavy loads.',
-  STARE:'To look fixedly at something for a long time.',
-  AROSE:'Past tense of arise — came into being or existence.',
-  STONE:'Hard solid non-metallic mineral matter; rock.',
-  AUDIO:'Relating to sound, especially recorded or broadcast sound.',
-  SLATE:'Fine-grained grey rock; also a list of candidates.',
-  BLAZE:'A large fierce fire; to burn fiercely.',
-  FROST:'A deposit of small white ice crystals formed when temperature falls below freezing.',
-  GROAN:'A deep inarticulate sound made in pain or despair.',
-  HEIST:'A robbery, especially an elaborate one.',
-  PLUMB:'Exactly vertical; or to measure the depth of something.',
-  TROVE:'A store of valuable or delightful things.',
-  QUIRK:'A peculiar aspect of a person\'s character or behaviour.',
-  VOGUE:'The prevailing fashion or style at a particular time.',
-  SWIFT:'Happening quickly; the fast-flying insect-eating bird.',
-  WORLD:'The earth and all its inhabitants.',
-  ITALY:'Country in southern Europe, shaped like a boot, famous for food and art.',
-};
-
-// ── END SCREEN ─────────────────────────────────────────
+// ══════════════════════════════════════════
+// END SCREEN
+// ══════════════════════════════════════════
+const DEFS = {JAPAN:'Island nation in East Asia.',CRANE:'A tall wading bird, or a machine for lifting.',STARE:'To look fixedly for a long time.',AROSE:'Past tense of arise.',STONE:'Hard mineral matter; rock.',SLATE:'A grey rock; also a list of candidates.',IRATE:'Feeling great anger.',WORLD:'The earth and all its inhabitants.',ITALY:'Country in southern Europe.',LEAST:'Smallest in amount or degree.',TEARS:'Drops from the eye; also rips apart.',RAISE:'To lift or increase.',AUDIO:'Relating to sound or hearing.',TRACE:'A mark or sign left behind.',STERN:'Serious and unrelenting; rear of a ship.',GROAN:'A deep sound of pain or despair.',BEACH:'Sandy shore by the sea.',FLAME:'A stream of burning gas.',BLAZE:'A bright and fierce fire.',STARK:'Severe or bare in appearance.',TRYST:'A secret meeting between lovers.',KNAVE:'A dishonest or unscrupulous man.',QUIRK:'A peculiar habit or trait.'};
 function showEnd(won) {
-  gridEl.style.display = 'none';
-  const es = document.getElementById('es'); es.classList.add('on');
-  document.getElementById('elbl').textContent = won ? 'You got it!' : 'The word was';
-  document.getElementById('eword').textContent = G.word;
-  const def = DEFS[G.word];
-  const dd = document.getElementById('edef');
-  if (def) { dd.textContent = def; dd.style.display = 'block'; } else dd.style.display='none';
-  const isCh = G.mode==='challenge', isEnd = G.mode==='endless';
-  document.getElementById('emsg').textContent = won
-    ? (isCh ? 'Challenge complete! ' : '') + 'Solved in '+G.row+' '+(G.row===1?'guess':'guesses')+'.'+(isEnd?' Play again!':isCh?'':' Come back tomorrow.')
-    : 'The answer was '+G.word+'.'+(isCh?' Better luck next time!':isEnd?' Try again!':' Come back tomorrow.');
-  document.getElementById('btn-replay').style.display = isEnd ? 'block' : 'none';
-  document.getElementById('btn-chagain').style.display = isCh ? 'block' : 'none';
+  gridEl.style.display='none';
+  const es=document.getElementById('endscreen'); es.classList.add('show');
+  document.getElementById('endlabel').textContent=won?'You got it!':'The word was';
+  document.getElementById('endword').textContent=state.word;
+  const def=DEFS[state.word];
+  const de=document.getElementById('enddef');
+  if (def) { de.textContent=def; de.style.display='block'; } else de.style.display='none';
+  const ch=state.mode==='challenge', en=state.mode==='endless';
+  document.getElementById('endmsg').textContent=won
+    ?(ch?`Challenge solved in ${state.row} ${state.row===1?'guess':'guesses'}!`:`Solved in ${state.row} ${state.row===1?'guess':'guesses'}.${en?' Play again!':' Come back tomorrow.'}`)
+    :(ch?`The word was ${state.word}.`:`The answer was ${state.word}.${en?' Try again!':' Come back tomorrow.'}`);
+  document.getElementById('btn-replay').style.display   = en?'block':'none';
+  document.getElementById('btn-ch-again').style.display = ch?'block':'none';
 }
 
-// ── SHARE ──────────────────────────────────────────────
-const EM = {correct:{n:'🟩',c:'🟦'},present:{n:'🟨',c:'🟧'},absent:{n:'⬛',c:'⬛'}};
-document.getElementById('btn-share').addEventListener('click', () => {
-  const c = cfg.cb;
-  const lines = G.results.map(({result}) => result.map(r=>EM[r][c?'c':'n']).join(''));
-  const won = G.results.at(-1)?.result.every(r=>r==='correct');
-  const tag = G.mode==='challenge'?' ⚔':G.mode==='endless'?' ∞':cfg.hard?' ★':'';
-  const text = 'KNUCKLE'+tag+' '+(won?G.results.length:'X')+'/'+MG+'\n\n'+lines.join('\n');
-  navigator.clipboard.writeText(text).then(() => {
-    const b = document.getElementById('btn-share'); b.textContent='Copied! ✓';
-    setTimeout(()=>b.innerHTML='Share &#x1F7E9;', 1800);
-  }).catch(()=>toast('Copy failed',1500,'err'));
+// ══════════════════════════════════════════
+// SHARE
+// ══════════════════════════════════════════
+const EM={correct:{n:'🟩',cb:'🟦'},present:{n:'🟨',cb:'🟧'},absent:{n:'⬛',cb:'⬛'}};
+document.getElementById('btn-share').addEventListener('click', ()=>{
+  const cb=cfg.cb;
+  const lines=state.results.map(({result})=>result.map(r=>EM[r][cb?'cb':'n']).join(''));
+  const won=state.results.at(-1)?.result.every(r=>r==='correct');
+  const score=won?state.results.length:'X';
+  const tag=state.mode==='challenge'?' ⚔':state.mode==='endless'?' ∞':cfg.hard?' ★':'';
+  navigator.clipboard.writeText(`KNUCKLE${tag} ${score}/${MG}\n\n${lines.join('\n')}`).then(()=>{
+    const b=document.getElementById('btn-share'); const o=b.textContent;
+    b.textContent='Copied! ✓'; setTimeout(()=>b.textContent=o,1800);
+  }).catch(()=>toast('Copy failed',1500,'iserr'));
 });
 
-// ── STREAK BAR ─────────────────────────────────────────
-function updateBar() {
-  const sp=document.getElementById('sp'), ss=document.getElementById('ss'),
-        sb2=document.getElementById('sb2'), spct=document.getElementById('spct'),
-        flm=document.getElementById('flm');
-  if(sp)   sp.textContent   = stats.played;
-  if(ss)   ss.textContent   = stats.streak;
-  if(sb2)  sb2.textContent  = stats.best;
-  if(spct) spct.textContent = stats.played ? Math.round(stats.wins/stats.played*100)+'%' : '0%';
-  if(flm)  flm.classList.toggle('on', stats.streak >= 3);
+// ══════════════════════════════════════════
+// MODE / RESET
+// ══════════════════════════════════════════
+function setBadge(txt, cls='') {
+  const b=document.getElementById('modebadge');
+  b.textContent=txt; b.className='';
+  if (txt) { b.classList.add('show'); if(cls) b.classList.add(cls); }
 }
-
-// ── BADGE ──────────────────────────────────────────────
-function setBadge(txt, cls) {
-  const b = document.getElementById('mbadge');
-  b.textContent = txt; b.className = txt ? 'on'+(cls?' '+cls:'') : '';
-}
-
-// ── RESET GAME ─────────────────────────────────────────
 function resetGame(word, mode) {
-  G = {word:word.toUpperCase(),mode,row:0,col:0,guess:[],over:false,results:[]};
-  hardC = []; kState = {};
-  buildGrid(); buildKB();
-  document.getElementById('es').classList.remove('on');
-  gridEl.style.display = 'flex';
-  document.getElementById('btn-ch').classList.toggle('chon', mode==='challenge');
+  state={word:word.toUpperCase(),mode,row:0,col:0,guess:[],over:false,results:[]};
+  hardCons=[]; kState={};
+  buildGrid(); buildKb();
+  document.getElementById('endscreen').classList.remove('show');
+  gridEl.style.display='flex';
+  document.getElementById('btn-challenge').classList.toggle('ch-on', mode==='challenge');
+  document.getElementById('datebadge').textContent=mode==='daily'?todayStr():'';
 }
-
-document.getElementById('btn-replay').addEventListener('click', () => {
-  resetGame(POOL[Math.floor(Math.random()*POOL.length)], 'endless');
+document.getElementById('btn-replay').addEventListener('click', ()=>{
+  resetGame(POOL[Math.floor(Math.random()*POOL.length)],'endless');
   setBadge('endless mode');
 });
-document.getElementById('btn-chagain').addEventListener('click', () => openCh());
+document.getElementById('btn-ch-again').addEventListener('click', openChallenge);
 
-// ── STATS MODAL ────────────────────────────────────────
-function openStats() {
-  ['p','w','s','b'].forEach(k => {
-    const map = {p:stats.played,w:stats.wins,s:stats.streak,b:stats.best};
-    document.getElementById('m-'+k).textContent = map[k];
-  });
-  const chart = document.getElementById('dchart'); chart.innerHTML='';
-  const maxV = Math.max(1,...Object.values(stats.dist));
-  const lastWon = G.over && G.results.at(-1)?.result.every(r=>r==='correct');
-  const lastRow = lastWon ? String(G.row) : '';
+// ══════════════════════════════════════════
+// STREAK BAR
+// ══════════════════════════════════════════
+function updateBar() {
+  document.getElementById('s-played').textContent=stats.played;
+  document.getElementById('s-streak').textContent=stats.streak;
+  document.getElementById('s-best').textContent=stats.best;
+  document.getElementById('s-pct').textContent=(stats.played?Math.round(stats.wins/stats.played*100):0)+'%';
+  document.getElementById('flame').classList.toggle('show', stats.streak>=3);
+}
+
+// ══════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function wireModal(btnId, ovId, xId) {
+  document.getElementById(btnId).addEventListener('click', ()=>openModal(ovId));
+  document.getElementById(xId).addEventListener('click',  ()=>closeModal(ovId));
+  document.getElementById(ovId).addEventListener('click', e=>{ if(e.target===e.currentTarget) closeModal(ovId); });
+}
+wireModal('btn-stats',    'ov-stats',    'x-stats');
+wireModal('btn-settings', 'ov-settings', 'x-settings');
+
+// Stats populate
+document.getElementById('btn-stats').addEventListener('click', ()=>{
+  ['played','wins','streak','best'].forEach(k => document.getElementById('m-'+k).textContent=stats[k]);
+  const ch=document.getElementById('distchart'); ch.innerHTML='';
+  const mx=Math.max(1,...Object.values(stats.dist));
+  const lastWon=state.over&&state.results.at(-1)?.result.every(r=>r==='correct');
+  const lr=lastWon?String(state.row):'';
   for (let i=1;i<=6;i++) {
-    const val=stats.dist[i]||0, pct=Math.max(8,Math.round(val/maxV*100));
-    const row=document.createElement('div'); row.className='br';
-    row.innerHTML='<div class="bl">'+i+'</div><div class="bt"><div class="bf'+(String(i)===lastRow?' cur':'')+'" style="width:0%">'+val+'</div></div>';
-    chart.appendChild(row);
-    setTimeout(()=>row.querySelector('.bf').style.width=pct+'%', 60);
+    const v=stats.dist[i]||0, pct=Math.max(8,Math.round(v/mx*100));
+    const row=document.createElement('div'); row.className='barrow';
+    row.innerHTML=`<div class="barlabel">${i}</div><div class="bartrack"><div class="barfill${String(i)===lr?' cur':''}" style="width:0%">${v}</div></div>`;
+    ch.appendChild(row);
+    setTimeout(()=>row.querySelector('.barfill').style.width=pct+'%',60);
   }
-  document.getElementById('mo-stat').classList.add('on');
+});
+
+// Settings toggles
+wireTog('tog-hard', v=>{
+  if (state.row>0&&!state.over) { toast('Finish current game first',1800,'iserr'); return; }
+  cfg.hard=v; setHardUI(v); toast(v?'Hard mode on':'Hard mode off',1600);
+});
+wireTog('tog-sound', v=>{ cfg.sound=v; syncTog('tog-sound',v); });
+wireTog('tog-cb',    v=>{ setCb(v); });
+wireTog('tog-hc',    v=>{ setHc(v); });
+wireTog('tog-theme', v=>{ setTheme(v?'dark':'light'); });
+
+// Header shortcuts
+document.getElementById('btn-cb').addEventListener('click',    ()=>{ setCb(!cfg.cb); saveCfg(); });
+document.getElementById('btn-hc').addEventListener('click',    ()=>{ setHc(!cfg.hc); saveCfg(); });
+document.getElementById('btn-theme').addEventListener('click', ()=>{ setTheme(cfg.theme==='dark'?'light':'dark'); saveCfg(); });
+
+// ══════════════════════════════════════════
+// CHALLENGE
+// ══════════════════════════════════════════
+let chWord=[], chCode='';
+function openChallenge() {
+  resetChSet(); switchChTab('set');
+  openModal('ov-challenge');
 }
-function closeStats() { document.getElementById('mo-stat').classList.remove('on'); }
-document.getElementById('btn-stat').addEventListener('click', openStats);
-document.getElementById('stat-close').addEventListener('click', closeStats);
-document.getElementById('mo-stat').addEventListener('click', e=>{if(e.target===e.currentTarget)closeStats();});
-
-// ── SETTINGS MODAL ─────────────────────────────────────
-document.getElementById('btn-set').addEventListener('click', () => document.getElementById('mo-set').classList.add('on'));
-document.getElementById('set-close').addEventListener('click', () => { document.getElementById('mo-set').classList.remove('on'); saveCfg(); });
-document.getElementById('mo-set').addEventListener('click', e => { if(e.target===e.currentTarget){document.getElementById('mo-set').classList.remove('on');saveCfg();} });
-
-// ── CHALLENGE MODAL ────────────────────────────────────
-let chL = [], chCode='', chLoaded='';
-
-function openCh() { resetChSet(); switchChTab('set'); document.getElementById('mo-ch').classList.add('on'); }
-function closeCh() { document.getElementById('mo-ch').classList.remove('on'); }
-document.getElementById('btn-ch').addEventListener('click', openCh);
-document.getElementById('ch-close').addEventListener('click', closeCh);
-document.getElementById('mo-ch').addEventListener('click', e=>{if(e.target===e.currentTarget)closeCh();});
-
 function switchChTab(which) {
-  document.getElementById('tab-set').classList.toggle('on', which==='set');
-  document.getElementById('tab-ent').classList.toggle('on', which==='ent');
-  document.getElementById('chsp').classList.toggle('on', which==='set');
-  document.getElementById('chep').classList.toggle('on', which==='ent');
-  if (which==='ent') {
-    document.getElementById('ch-in').value='';
-    document.getElementById('ch-ent-err').textContent='';
-    document.getElementById('btn-start').disabled=true;
-    chLoaded='';
+  ['set','enter'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('on', t===which);
+    document.getElementById('ch-'+t).classList.toggle('on', t===which);
+  });
+  if (which==='enter') {
+    document.getElementById('chinput').value='';
+    document.getElementById('chenterr').textContent='';
+    document.getElementById('btn-startch').disabled=true;
+    loadedWord='';
   }
 }
-document.getElementById('tab-set').addEventListener('click', ()=>switchChTab('set'));
-document.getElementById('tab-ent').addEventListener('click', ()=>switchChTab('ent'));
+document.getElementById('btn-challenge').addEventListener('click', openChallenge);
+document.getElementById('x-challenge').addEventListener('click',  ()=>closeModal('ov-challenge'));
+document.getElementById('ov-challenge').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeModal('ov-challenge'); });
+document.getElementById('tab-set').addEventListener('click',   ()=>switchChTab('set'));
+document.getElementById('tab-enter').addEventListener('click', ()=>switchChTab('enter'));
 
 function buildChDisp() {
-  const d=document.getElementById('ch-wd'); d.innerHTML='';
+  const d=document.getElementById('chdisp'); d.innerHTML='';
   for (let i=0;i<WL;i++) {
     const t=document.createElement('div');
-    t.className='cht2'+(i===chL.length?' act':chL[i]?' fil':'');
-    t.textContent=chL[i]||'';
+    t.className='chtile'+(i===chWord.length?' cur':chWord[i]?' filled':'');
+    t.textContent=chWord[i]||'';
     d.appendChild(t);
   }
 }
-function buildChKB() {
-  const el=document.getElementById('ch-kb'); el.innerHTML='';
-  KBROWS.forEach(row => {
-    const r=document.createElement('div'); r.className='chkbr';
-    row.forEach(k => {
+function buildChKb() {
+  const el=document.getElementById('chkb'); el.innerHTML='';
+  KB.forEach(row=>{
+    const re=document.createElement('div'); re.className='chkbrow';
+    row.forEach(k=>{
       const b=document.createElement('button');
-      b.className='ck'+(k.length>1?' w':'');
-      b.textContent=k;
-      b.addEventListener('click',()=>handleChKey(k));
-      r.appendChild(b);
+      b.className='chkey'+(k.length>1?' wide':'');
+      b.textContent=k; b.addEventListener('click',()=>handleChKey(k));
+      re.appendChild(b);
     });
-    el.appendChild(r);
+    el.appendChild(re);
   });
 }
 function handleChKey(k) {
-  if (k==='⌫') { if(chL.length) chL.pop(); }
+  if (k==='⌫') { if(chWord.length) chWord.pop(); }
   else if (k==='ENTER') { genCode(); return; }
-  else if (/^[A-Z]$/.test(k) && chL.length<WL) chL.push(k);
-  document.getElementById('ch-err').textContent='';
-  document.getElementById('ch-cbox').classList.remove('on');
-  document.getElementById('btn-copy').style.display='none';
-  document.getElementById('btn-gen').style.display='block';
+  else if (/^[A-Z]$/.test(k)&&chWord.length<WL) chWord.push(k);
+  document.getElementById('cherr').textContent='';
+  document.getElementById('codebox').classList.remove('show');
+  document.getElementById('btn-copycode').style.display='none';
+  document.getElementById('btn-gencode').style.display='block';
   buildChDisp();
 }
 function genCode() {
-  const w=chL.join('');
-  if (w.length<WL) { document.getElementById('ch-err').textContent='Word must be 5 letters.'; return; }
-  chCode=encodeWord(w);
-  document.getElementById('ch-cv').textContent=fmtCode(chCode);
-  document.getElementById('ch-cbox').classList.add('on');
-  document.getElementById('btn-gen').style.display='none';
-  document.getElementById('btn-copy').style.display='block';
-  document.getElementById('ch-err').textContent='';
+  const word=chWord.join('');
+  if (word.length<WL) { document.getElementById('cherr').textContent='Word must be 5 letters.'; return; }
+  if (!/^[A-Z]{5}$/.test(word)) { document.getElementById('cherr').textContent='Letters only.'; return; }
+  document.getElementById('cherr').textContent='';
+  chCode=encodeWord(word);
+  document.getElementById('codevalue').textContent=fmtCode(chCode);
+  document.getElementById('codebox').classList.add('show');
+  document.getElementById('btn-gencode').style.display='none';
+  document.getElementById('btn-copycode').style.display='block';
 }
+document.getElementById('btn-gencode').addEventListener('click', genCode);
+document.getElementById('btn-copycode').addEventListener('click', ()=>{
+  navigator.clipboard.writeText(document.getElementById('codevalue').textContent).then(()=>{
+    const b=document.getElementById('btn-copycode');
+    b.textContent='Copied! ✓'; setTimeout(()=>b.textContent='Copy Code',2000);
+  });
+});
 function resetChSet() {
-  chL=[]; chCode='';
-  document.getElementById('ch-err').textContent='';
-  document.getElementById('ch-cbox').classList.remove('on');
-  document.getElementById('btn-copy').style.display='none';
-  document.getElementById('btn-gen').style.display='block';
-  buildChDisp(); buildChKB();
+  chWord=[]; chCode='';
+  document.getElementById('cherr').textContent='';
+  document.getElementById('codebox').classList.remove('show');
+  document.getElementById('btn-copycode').style.display='none';
+  document.getElementById('btn-gencode').style.display='block';
+  buildChDisp(); buildChKb();
 }
-document.getElementById('btn-gen').addEventListener('click', genCode);
-document.getElementById('btn-copy').addEventListener('click', () => {
-  navigator.clipboard.writeText(document.getElementById('ch-cv').textContent).then(()=>{
-    const b=document.getElementById('btn-copy'); b.textContent='Copied! ✓';
-    setTimeout(()=>b.textContent='Copy Code to Clipboard',2000);
-  });
+
+let loadedWord='';
+document.getElementById('chinput').addEventListener('input', e=>{
+  const decoded=decodeCode(e.target.value);
+  const err=document.getElementById('chenterr');
+  const go=document.getElementById('btn-startch');
+  if (!e.target.value.trim()) { err.textContent=''; loadedWord=''; go.disabled=true; return; }
+  if (!decoded) { err.textContent='Invalid code.'; err.style.color='var(--accent)'; loadedWord=''; go.disabled=true; }
+  else { err.textContent='✓ Valid — ready!'; err.style.color='var(--correct)'; loadedWord=decoded; go.disabled=false; }
+});
+document.getElementById('btn-chgo').addEventListener('click',    ()=>document.getElementById('chinput').dispatchEvent(new Event('input')));
+document.getElementById('btn-startch').addEventListener('click', ()=>{
+  if (!loadedWord) return;
+  closeModal('ov-challenge');
+  resetGame(loadedWord,'challenge');
+  setBadge('⚔ challenge','chbadge');
+  toast('Challenge loaded!',1800);
 });
 
-document.getElementById('ch-in').addEventListener('input', e => {
-  const dec=decodeCode(e.target.value);
-  const err=document.getElementById('ch-ent-err'), go=document.getElementById('btn-start');
-  if (!e.target.value.trim()) { err.textContent=''; chLoaded=''; go.disabled=true; return; }
-  if (!dec) { err.textContent='Invalid code — check and try again.'; err.style.color='var(--acc)'; chLoaded=''; go.disabled=true; }
-  else { err.textContent='✓ Valid code — ready!'; err.style.color='var(--cor)'; chLoaded=dec; go.disabled=false; }
-});
-document.getElementById('btn-go').addEventListener('click', () => document.getElementById('ch-in').dispatchEvent(new Event('input')));
-document.getElementById('btn-start').addEventListener('click', () => {
-  if (!chLoaded) return;
-  // Ensure the challenge word is always accepted as a valid guess
-  WORDS.add(chLoaded.toUpperCase());
-  closeCh(); resetGame(chLoaded,'challenge');
-  setBadge('⚔ challenge','ch'); toast('Challenge loaded — good luck!',2000);
-});
-
-// ── INIT ───────────────────────────────────────────────
-function init() {
-  initCfg();
-  updateBar();
-  resetGame(getDailyWord(), 'daily');
-  const dtb = document.getElementById('dtbadge');
-  if (dtb) dtb.textContent = todayStr();
-  if (cfg.hard) setBadge('★ hard mode');
-  document.addEventListener('keydown', e => {
-    if (e.key==='Escape') document.querySelectorAll('.mo.on').forEach(m=>m.classList.remove('on'));
-  });
-}
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+applyAll();
+updateBar();
+resetGame(getDailyWord(), 'daily');
+document.getElementById('datebadge').textContent=todayStr();
+if (cfg.hard) setBadge('★ hard mode');
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open')); });
 </script>
 </body>
 </html>
